@@ -1,6 +1,6 @@
-package com.selcukaloba.to_do_api_project.Entity;
+package com.selcukaloba.to_do_api_project.entity;
 
-import com.selcukaloba.to_do_api_project.Enums.TaskType;
+import com.selcukaloba.to_do_api_project.enums.TaskType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Data
