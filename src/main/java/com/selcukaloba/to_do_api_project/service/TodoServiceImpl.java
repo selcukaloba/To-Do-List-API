@@ -52,11 +52,11 @@ public class TodoServiceImpl implements ITodoService{
     public TodoResponse updateTodo(Long id, TodoUpdateRequest request) {
         Todo todo = todoRepository.findById(id)
                 .orElseThrow(() -> new BaseException(new ErrorMessage("id: " + id, MessageType.NO_RECORD_EXISTS)));
-            BeanUtils.copyProperties(request, todo); //postmanden geleni db'dekinin üstüne yaz
+            BeanUtils.copyProperties(request, todo);
             todo.setId(id);//id kopyalanırken bozulmasın
             Todo updatedTodo = todoRepository.save(todo);
             TodoResponse response = new TodoResponse();
-            BeanUtils.copyProperties(updatedTodo, response); //gönderme dtosuna çevir
+            BeanUtils.copyProperties(updatedTodo, response);
             return response;
     }
 
