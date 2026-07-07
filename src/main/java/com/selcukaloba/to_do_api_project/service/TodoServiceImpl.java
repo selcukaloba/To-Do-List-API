@@ -37,7 +37,7 @@ public class TodoServiceImpl implements ITodoService{
 
     @Override
     public List<TodoResponse> getAllTodo() {
-        List<Todo> todoList = todoRepository.findAll();
+        List<Todo> todoList = todoRepository.findByIsCompletedFalse();
         List<TodoResponse> responseList = new ArrayList<>();
         for(Todo todo: todoList)
         {
