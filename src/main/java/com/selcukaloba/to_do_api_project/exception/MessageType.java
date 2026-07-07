@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum MessageType {
-    NO_RECORD_EXISTS("1001", "No such records!"),
+    NO_RECORD_EXISTS("1001", "No such record!"),
     USERNAME_NOT_FOUND("1002", "No such user!"),
     GENERAL_EXCEPTION("9999", "General exception!");
 
