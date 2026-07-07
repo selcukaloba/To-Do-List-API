@@ -4,6 +4,9 @@ import com.selcukaloba.to_do_api_project.dto.TodoCreateRequest;
 import com.selcukaloba.to_do_api_project.dto.TodoResponse;
 import com.selcukaloba.to_do_api_project.dto.TodoUpdateRequest;
 import com.selcukaloba.to_do_api_project.entity.Todo;
+import com.selcukaloba.to_do_api_project.exception.BaseException;
+import com.selcukaloba.to_do_api_project.exception.ErrorMessage;
+import com.selcukaloba.to_do_api_project.exception.MessageType;
 import com.selcukaloba.to_do_api_project.repository.TodoRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +50,8 @@ public class TodoServiceImpl implements ITodoService{
 
     @Override
     public TodoResponse updateTodo(Long id, TodoUpdateRequest request) {
-        Todo todo = todoRepository.findById(id).orElseThrow(()->new RuntimeException("Todo not found with id of "+ id));
-
+        Todo todo = todoRepository.findById(id)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("id: " + id, MessageType.NO_RECORD_EXISTS)));
             BeanUtils.copyProperties(request, todo); //postmanden geleni db'dekinin üstüne yaz
             todo.setId(id);//id kopyalanırken bozulmasın
             Todo updatedTodo = todoRepository.save(todo);
@@ -65,7 +68,7 @@ public class TodoServiceImpl implements ITodoService{
         }
         else
         {
-            throw new RuntimeException("Todo not found with id of " + id);
+            throw new BaseException(new ErrorMessage("id: " + id, MessageType.NO_RECORD_EXISTS));
         }
     }
 
