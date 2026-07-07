@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface TodoRepository extends JpaRepository<Todo, Long> {
     List<Todo> findByIsCompletedFalseAndReminderDateBetween(LocalDateTime start, LocalDateTime end);
+    List<Todo> findByIsCompletedFalse();
 }
