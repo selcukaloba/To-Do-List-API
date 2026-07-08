@@ -42,4 +42,8 @@ public class Todo {
 
     @Column(nullable = false, name = "is_completed")
     private boolean isCompleted = false;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
