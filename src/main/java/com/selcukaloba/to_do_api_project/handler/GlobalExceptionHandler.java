@@ -20,26 +20,38 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {BaseException.class})
     public ResponseEntity<ApiError<?>> handleBaseException(BaseException ex, WebRequest request)
     {
-        return ResponseEntity.badRequest().body(createApiError(ex.getMessage(), request));
+        return ResponseEntity.badRequest().body(createApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), request));
     }
 
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
-    public ResponseEntity<ApiError<Map<String, List<String>>>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request)
+    public ResponseEntity<ApiError<Map<String, List<String>>>> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException ex, WebRequest request)
     {
         Map<String, List<String>> map = new HashMap<>();
-        for(ObjectError objError:ex.getBindingResult().getAllErrors())
+
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors())
         {
-            String fieldName = ((FieldError)objError).getField();
-            if(map.containsKey(fieldName))
+            String fieldName = fieldError.getField();
+            if (map.containsKey(fieldName)) {
+                map.put(fieldName, addValue(map.get(fieldName), fieldError.getDefaultMessage()));
+            } else {
+                map.put(fieldName, addValue(new ArrayList<>(), fieldError.getDefaultMessage()));
+            }
+        }
+
+        for (org.springframework.validation.ObjectError objectError : ex.getBindingResult().getGlobalErrors())
+        {
+            String objectName = objectError.getObjectName();
+            if (map.containsKey(objectName))
             {
-                map.put(fieldName, addValue(map.get(fieldName), objError.getDefaultMessage()));
+                map.put(objectName, addValue(map.get(objectName), objectError.getDefaultMessage()));
             }
             else
             {
-                map.put(fieldName, addValue(new ArrayList<>(), objError.getDefaultMessage()));
+                map.put(objectName, addValue(new ArrayList<>(), objectError.getDefaultMessage()));
             }
         }
-        return ResponseEntity.badRequest().body(createApiError(map, request));
+        return ResponseEntity.badRequest().body(createApiError(HttpStatus.BAD_REQUEST, map, request));
     }
 
     private List<String> addValue(List<String> list, String newValue)
@@ -58,10 +70,10 @@ public class GlobalExceptionHandler {
         return "";
     }
 
-    public <E> ApiError<E> createApiError(E message, WebRequest request)
+    public <E> ApiError<E> createApiError(HttpStatus status, E message, WebRequest request)
     {
         ApiError<E> apiError = new ApiError<E>();
-        apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        apiError.setStatus(status.value());
         ExceptionDetails<E> exceptionDetails = new ExceptionDetails<>();
         exceptionDetails.setPath(request.getDescription(false).substring(4));
         exceptionDetails.setErrorTime(new Date());

@@ -2,6 +2,7 @@ package com.selcukaloba.to_do_api_project.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.selcukaloba.to_do_api_project.enums.TaskType;
+import com.selcukaloba.to_do_api_project.validator.TaskDateMatch;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@TaskDateMatch
 public class TodoCreateRequest {
 
     @NotBlank(message = "title cannot be empty!")
