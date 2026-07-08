@@ -10,6 +10,7 @@ import com.selcukaloba.to_do_api_project.exception.MessageType;
 import com.selcukaloba.to_do_api_project.repository.TodoRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
@@ -72,10 +73,20 @@ public class TodoServiceImpl implements ITodoService{
         }
     }
 
+    @Value("${todo.max.upcoming.days}")
+    private int maxUpcomingDays;
+
     @Override
-    public List<TodoResponse> getUpcomingReminders() {
+    public List<TodoResponse> getUpcomingReminders(int days) {
+
+        if(days<0 || days>maxUpcomingDays)
+        {
+            throw new BaseException(new ErrorMessage("requested days: "+ days + ", max allowed: "+ maxUpcomingDays, MessageType.INVALID_DAY_RANGE));
+        }
+
+
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime targetTime = now.plusDays(7);
+        LocalDateTime targetTime = now.plusDays(days);
 
         List<Todo> todoList = todoRepository.findByIsCompletedFalseAndReminderDateBetween(now, targetTime);
         List<TodoResponse> responseList = new ArrayList<>();
