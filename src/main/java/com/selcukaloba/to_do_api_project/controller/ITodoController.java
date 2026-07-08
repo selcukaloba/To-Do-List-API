@@ -11,5 +11,5 @@ public interface ITodoController {
     List<TodoResponse> getAllTodo();
     TodoResponse updateTodo(Long id, TodoUpdateRequest request);
     void deleteTodo(Long id);
-    List<TodoResponse>getUpcomingReminders();
+    List<TodoResponse>getUpcomingReminders(int days);
 }

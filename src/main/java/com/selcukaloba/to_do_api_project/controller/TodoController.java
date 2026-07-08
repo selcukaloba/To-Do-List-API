@@ -45,7 +45,7 @@ public class TodoController implements ITodoController {
 
     @GetMapping(path = "/upcomings")
     @Override
-    public List<TodoResponse> getUpcomingReminders() {
-        return todoService.getUpcomingReminders();
+    public List<TodoResponse> getUpcomingReminders(@RequestParam(name = "days", required = false, defaultValue = "7") int days) {
+        return todoService.getUpcomingReminders(days);
     }
 }

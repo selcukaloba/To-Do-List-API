@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum MessageType {
     NO_RECORD_EXISTS("1001", "No such record!"),
     USERNAME_NOT_FOUND("1002", "No such user!"),
-    GENERAL_EXCEPTION("9999", "General exception!");
+    GENERAL_EXCEPTION("9999", "General exception!"),
+    INVALID_DAY_RANGE("1003", "Invalid day range!");
 
     private String code, message;
 
