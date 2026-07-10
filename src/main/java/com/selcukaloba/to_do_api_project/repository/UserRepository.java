@@ -2,8 +2,10 @@ package com.selcukaloba.to_do_api_project.repository;
 
 import com.selcukaloba.to_do_api_project.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByUsername(String username);
 }
