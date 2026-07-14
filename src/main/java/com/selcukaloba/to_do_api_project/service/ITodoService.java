@@ -12,5 +12,6 @@ public interface ITodoService {
     public TodoResponse updateTodo(Long id, TodoUpdateRequest request);
     public void deleteTodo(Long id);
     public List<TodoResponse>getUpcomingReminders(int days);
-
+    void shareTodoWithFriend(Long id, String ownerUsername, String friendUsername);
+    List<TodoResponse>getSharedTodos(String username);
 }
