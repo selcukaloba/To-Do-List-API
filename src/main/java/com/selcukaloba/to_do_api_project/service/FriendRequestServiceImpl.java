@@ -1,5 +1,6 @@
 package com.selcukaloba.to_do_api_project.service;
 
+import com.selcukaloba.to_do_api_project.dto.FriendRequestResponse;
 import com.selcukaloba.to_do_api_project.entity.FriendRequest;
 import com.selcukaloba.to_do_api_project.entity.User;
 import com.selcukaloba.to_do_api_project.enums.FriendRequestStatus;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FriendRequestServiceImpl implements IFriendRequestService{
@@ -41,8 +43,16 @@ public class FriendRequestServiceImpl implements IFriendRequestService{
     }
 
     @Override
-    public List<FriendRequest> getPendingRequests(String username) {
-        return friendRequestRepository.findByReceiverUsernameAndStatus(username, FriendRequestStatus.PENDING);
+    public List<FriendRequestResponse> getPendingRequests(String username) {
+        List<FriendRequest> requests = friendRequestRepository.findByReceiverUsernameAndStatus(username, FriendRequestStatus.PENDING);
+        return requests.stream()
+                .map(req->new FriendRequestResponse(
+                        req.getId(),
+                        req.getSender().getUsername(),
+                        req.getReceiver().getUsername(),
+                        req.getStatus()
+                )).collect(Collectors.toList());
+
     }
 
     @Override
