@@ -1,14 +1,17 @@
 package com.selcukaloba.to_do_api_project.service;
 
-import com.selcukaloba.to_do_api_project.dto.TodoCreateRequest;
-import com.selcukaloba.to_do_api_project.dto.TodoResponse;
-import com.selcukaloba.to_do_api_project.dto.TodoUpdateRequest;
+import com.selcukaloba.to_do_api_project.dto.*;
+import com.selcukaloba.to_do_api_project.entity.FriendRequest;
 import com.selcukaloba.to_do_api_project.entity.Todo;
+import com.selcukaloba.to_do_api_project.entity.TodoShareRequest;
 import com.selcukaloba.to_do_api_project.entity.User;
+import com.selcukaloba.to_do_api_project.enums.FriendRequestStatus;
+import com.selcukaloba.to_do_api_project.enums.TodoShareStatus;
 import com.selcukaloba.to_do_api_project.exception.BaseException;
 import com.selcukaloba.to_do_api_project.exception.ErrorMessage;
 import com.selcukaloba.to_do_api_project.exception.MessageType;
 import com.selcukaloba.to_do_api_project.repository.TodoRepository;
+import com.selcukaloba.to_do_api_project.repository.TodoShareRequestRepository;
 import com.selcukaloba.to_do_api_project.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TodoServiceImpl implements ITodoService{
@@ -31,6 +35,8 @@ public class TodoServiceImpl implements ITodoService{
     private TodoRepository todoRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TodoShareRequestRepository todoShareRequestRepository;
 
     @Override
     public TodoResponse createTodo(TodoCreateRequest request, String username) {
@@ -129,9 +135,22 @@ public class TodoServiceImpl implements ITodoService{
         {
             throw new RuntimeException("Already shared!");
         }
-        todo.getSharedUsers().add(friend);
-        todoRepository.save(todo);
 
+        boolean hasPendingShare = todoShareRequestRepository
+                .findByReceiverUsernameAndStatus(friendUsername, TodoShareStatus.PENDING)
+                .stream()
+                .anyMatch(req -> req.getTodo().getId().equals(id) && req.getSender().getUsername().equals(ownerUsername));
+
+        if (hasPendingShare) {
+            throw new RuntimeException("A share request for this Todo is already pending!");
+        }
+
+        TodoShareRequest shareRequest = new TodoShareRequest();
+        shareRequest.setTodo(todo);
+        shareRequest.setSender(todo.getUser());
+        shareRequest.setReceiver(friend);
+        shareRequest.setStatus(TodoShareStatus.PENDING);
+        todoShareRequestRepository.save(shareRequest);
     }
 
     @Override
@@ -147,5 +166,35 @@ public class TodoServiceImpl implements ITodoService{
             responseList.add(response);
         }
         return responseList;
+    }
+
+    @Override
+    public List<TodoShareRequestResponse> getPendingShareRequests(String username) {
+        List<TodoShareRequest> requests = todoShareRequestRepository.findByReceiverUsernameAndStatus(username, TodoShareStatus.PENDING);
+        return requests.stream()
+                .map(req->new TodoShareRequestResponse(
+                        req.getId(),
+                        req.getSender().getUsername(),
+                        req.getReceiver().getUsername(),
+                        req.getStatus(),
+                        req.getTodo().getId(),
+                        req.getTodo().getTitle()
+                )).collect(Collectors.toList());
+    }
+
+    @Override
+    public void acceptShareRequest(Long requestId) {
+        TodoShareRequest todoShareRequest = todoShareRequestRepository.findById(requestId).orElseThrow(()->new RuntimeException("Share request could not be found!"));
+        Todo todo = todoShareRequest.getTodo();
+        User receiver = todoShareRequest.getReceiver();
+        todo.getSharedUsers().add(receiver);
+        todoRepository.save(todo);
+        todoShareRequestRepository.delete(todoShareRequest);
+    }
+
+    @Override
+    public void rejectShareRequest(Long requestId) {
+        TodoShareRequest todoShareRequest = todoShareRequestRepository.findById(requestId).orElseThrow(()->new RuntimeException("Share request   could not be found!"));
+        todoShareRequestRepository.delete(todoShareRequest);
     }
 }
