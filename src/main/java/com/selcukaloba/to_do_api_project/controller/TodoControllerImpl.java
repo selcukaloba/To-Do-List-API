@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -45,5 +46,19 @@ public class TodoControllerImpl implements ITodoController {
     @Override
     public List<TodoResponse> getUpcomingReminders(@RequestParam(name = "days", required = false, defaultValue = "7") int days) {
         return todoService.getUpcomingReminders(days);
+    }
+
+    @PostMapping(path = "/share/{id}")
+    @Override
+    public void shareTodoWithFriend(@PathVariable(name = "id") Long id, Principal principal, @RequestParam String friendUsername) {
+        String loginuser = principal.getName();
+        todoService.shareTodoWithFriend(id, loginuser, friendUsername);
+    }
+
+    @GetMapping(path = "/shared/all")
+    @Override
+    public List<TodoResponse> getSharedTodos(Principal principal) {
+        String loginuser = principal.getName();
+        return todoService.getSharedTodos(loginuser);
     }
 }
