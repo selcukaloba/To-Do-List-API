@@ -2,6 +2,7 @@ package com.selcukaloba.to_do_api_project.controller;
 
 import com.selcukaloba.to_do_api_project.dto.TodoCreateRequest;
 import com.selcukaloba.to_do_api_project.dto.TodoResponse;
+import com.selcukaloba.to_do_api_project.dto.TodoShareRequestResponse;
 import com.selcukaloba.to_do_api_project.dto.TodoUpdateRequest;
 import com.selcukaloba.to_do_api_project.service.ITodoService;
 import jakarta.validation.Valid;
@@ -61,5 +62,24 @@ public class TodoControllerImpl implements ITodoController {
     public List<TodoResponse> getSharedTodos(Principal principal) {
         String loginuser = principal.getName();
         return todoService.getSharedTodos(loginuser);
+    }
+
+    @GetMapping(path = "/share/pending")
+    @Override
+    public List<TodoShareRequestResponse> getPendingShareRequests(Principal principal) {
+        String loginuser = principal.getName();
+        return todoService.getPendingShareRequests(loginuser);
+    }
+
+    @PutMapping(path = "/share/accept/{requestId}")
+    @Override
+    public void acceptShareRequest(@PathVariable(name = "requestId") Long requestId) {
+        todoService.acceptShareRequest(requestId);
+    }
+
+    @PutMapping(path = "/share/reject/{requestId}")
+    @Override
+    public void rejectShareRequest(@PathVariable(name = "requestId")Long requestId) {
+        todoService.rejectShareRequest(requestId);
     }
 }
