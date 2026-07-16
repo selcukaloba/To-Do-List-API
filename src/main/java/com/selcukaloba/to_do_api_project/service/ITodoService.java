@@ -2,6 +2,7 @@ package com.selcukaloba.to_do_api_project.service;
 
 import com.selcukaloba.to_do_api_project.dto.TodoCreateRequest;
 import com.selcukaloba.to_do_api_project.dto.TodoResponse;
+import com.selcukaloba.to_do_api_project.dto.TodoShareRequestResponse;
 import com.selcukaloba.to_do_api_project.dto.TodoUpdateRequest;
 
 import java.security.Principal;
@@ -15,4 +16,7 @@ public interface ITodoService {
     public List<TodoResponse>getUpcomingReminders(int days);
     void shareTodoWithFriend(Long id, String ownerUsername, String friendUsername);
     List<TodoResponse>getSharedTodos(String username);
+    List<TodoShareRequestResponse>getPendingShareRequests(String username);
+    void acceptShareRequest(Long requestId);
+    void rejectShareRequest(Long requestId);
 }
