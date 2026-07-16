@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,10 +33,13 @@ public class TodoServiceImpl implements ITodoService{
     private UserRepository userRepository;
 
     @Override
-    public TodoResponse createTodo(TodoCreateRequest request) {
+    public TodoResponse createTodo(TodoCreateRequest request, String username) {
+        User owner = userRepository.findByUsername(username).orElseThrow(()->new RuntimeException("User could not be found!"));
+
         TodoResponse response = new TodoResponse();
         Todo todo = new Todo();
         BeanUtils.copyProperties(request, todo);
+        todo.setUser(owner);
         Todo dbTodo = todoRepository.save(todo);
         BeanUtils.copyProperties(dbTodo, response);
         return response;

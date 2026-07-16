@@ -8,7 +8,7 @@ import java.security.Principal;
 import java.util.List;
 
 public interface ITodoController {
-    TodoResponse createTodo(TodoCreateRequest request);
+    TodoResponse createTodo(TodoCreateRequest request, Principal principal);
     List<TodoResponse> getAllTodo();
     TodoResponse updateTodo(Long id, TodoUpdateRequest request);
     void deleteTodo(Long id);

@@ -20,8 +20,9 @@ public class TodoControllerImpl implements ITodoController {
 
     @PostMapping(path = "/create")
     @Override
-    public TodoResponse createTodo(@Valid @RequestBody TodoCreateRequest request) {
-        return todoService.createTodo(request);
+    public TodoResponse createTodo(@Valid @RequestBody TodoCreateRequest request, Principal principal) {
+        String loginuser = principal.getName();
+        return todoService.createTodo(request, loginuser);
     }
 
     @GetMapping(path = "/all")

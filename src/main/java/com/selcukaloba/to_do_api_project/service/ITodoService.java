@@ -4,10 +4,11 @@ import com.selcukaloba.to_do_api_project.dto.TodoCreateRequest;
 import com.selcukaloba.to_do_api_project.dto.TodoResponse;
 import com.selcukaloba.to_do_api_project.dto.TodoUpdateRequest;
 
+import java.security.Principal;
 import java.util.List;
 
 public interface ITodoService {
-    public TodoResponse createTodo(TodoCreateRequest request);
+    public TodoResponse createTodo(TodoCreateRequest request, String username);
     public List<TodoResponse> getAllTodo();
     public TodoResponse updateTodo(Long id, TodoUpdateRequest request);
     public void deleteTodo(Long id);
