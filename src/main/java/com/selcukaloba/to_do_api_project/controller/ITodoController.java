@@ -4,6 +4,7 @@ import com.selcukaloba.to_do_api_project.dto.TodoCreateRequest;
 import com.selcukaloba.to_do_api_project.dto.TodoResponse;
 import com.selcukaloba.to_do_api_project.dto.TodoUpdateRequest;
 
+import java.security.Principal;
 import java.util.List;
 
 public interface ITodoController {
@@ -12,4 +13,6 @@ public interface ITodoController {
     TodoResponse updateTodo(Long id, TodoUpdateRequest request);
     void deleteTodo(Long id);
     List<TodoResponse>getUpcomingReminders(int days);
+    void shareTodoWithFriend(Long id, Principal principal, String friendUsername);
+    public List<TodoResponse> getSharedTodos(Principal principal);
 }
