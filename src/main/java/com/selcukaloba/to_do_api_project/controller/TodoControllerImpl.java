@@ -1,9 +1,9 @@
 package com.selcukaloba.to_do_api_project.controller;
 
-import com.selcukaloba.to_do_api_project.dto.TodoCreateRequest;
-import com.selcukaloba.to_do_api_project.dto.TodoResponse;
-import com.selcukaloba.to_do_api_project.dto.TodoShareRequestResponse;
-import com.selcukaloba.to_do_api_project.dto.TodoUpdateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.TodoCreateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.TodoResponse;
+import com.selcukaloba.to_do_api_project.dto.todo.TodoShareRequestResponse;
+import com.selcukaloba.to_do_api_project.dto.todo.TodoUpdateRequest;
 import com.selcukaloba.to_do_api_project.service.ITodoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

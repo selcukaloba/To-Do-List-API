@@ -1,4 +1,4 @@
-package com.selcukaloba.to_do_api_project.dto;
+package com.selcukaloba.to_do_api_project.dto.todo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.selcukaloba.to_do_api_project.enums.TaskType;

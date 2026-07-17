@@ -1,9 +1,8 @@
-package com.selcukaloba.to_do_api_project.dto;
+package com.selcukaloba.to_do_api_project.dto.todo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.selcukaloba.to_do_api_project.enums.TaskType;
 import com.selcukaloba.to_do_api_project.validator.TaskDateMatch;
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
