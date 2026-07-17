@@ -1,11 +1,12 @@
 package com.selcukaloba.to_do_api_project.service;
 
-import com.selcukaloba.to_do_api_project.dto.*;
-import com.selcukaloba.to_do_api_project.entity.FriendRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.TodoCreateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.TodoResponse;
+import com.selcukaloba.to_do_api_project.dto.todo.TodoShareRequestResponse;
+import com.selcukaloba.to_do_api_project.dto.todo.TodoUpdateRequest;
 import com.selcukaloba.to_do_api_project.entity.Todo;
 import com.selcukaloba.to_do_api_project.entity.TodoShareRequest;
 import com.selcukaloba.to_do_api_project.entity.User;
-import com.selcukaloba.to_do_api_project.enums.FriendRequestStatus;
 import com.selcukaloba.to_do_api_project.enums.TodoShareStatus;
 import com.selcukaloba.to_do_api_project.exception.BaseException;
 import com.selcukaloba.to_do_api_project.exception.ErrorMessage;
@@ -16,16 +17,11 @@ import com.selcukaloba.to_do_api_project.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

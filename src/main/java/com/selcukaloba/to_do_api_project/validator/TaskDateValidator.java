@@ -1,8 +1,7 @@
 package com.selcukaloba.to_do_api_project.validator;
 
-import com.selcukaloba.to_do_api_project.dto.TodoCreateRequest;
-import com.selcukaloba.to_do_api_project.dto.TodoUpdateRequest;
-import jakarta.validation.Constraint;
+import com.selcukaloba.to_do_api_project.dto.todo.TodoCreateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.TodoUpdateRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
