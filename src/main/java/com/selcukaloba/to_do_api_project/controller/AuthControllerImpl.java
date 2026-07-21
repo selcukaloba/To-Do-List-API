@@ -35,7 +35,7 @@ public class AuthControllerImpl implements IAuthController{
 
     @PostMapping("/refreshToken")
     @Override
-    public AuthResponse refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+    public AuthResponse refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
         return authService.refreshToken(refreshTokenRequest);
     }
 }
