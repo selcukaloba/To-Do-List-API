@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ITodoController {
     TodoResponse createTodo(TodoCreateRequest request, Principal principal);
-    List<TodoResponse> getAllTodo();
+    List<TodoResponse> getAllTodo(Principal principal);
     TodoResponse updateTodo(Long id, TodoUpdateRequest request);
     void deleteTodo(Long id);
     List<TodoResponse>getUpcomingReminders(int days);
