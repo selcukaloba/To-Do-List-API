@@ -48,8 +48,8 @@ public class TodoServiceImpl implements ITodoService{
     }
 
     @Override
-    public List<TodoResponse> getAllTodo() {
-        List<Todo> todoList = todoRepository.findByIsCompletedFalse();
+    public List<TodoResponse> getAllTodo(String username) {
+        List<Todo> todoList = todoRepository.findAllTodosByOwnerOrSharedUser(username);
         List<TodoResponse> responseList = new ArrayList<>();
         for(Todo todo: todoList)
         {
@@ -84,7 +84,7 @@ public class TodoServiceImpl implements ITodoService{
         }
     }
 
-    @Value("${todo.max.upcoming.days}")
+    @Value("${todo.max.upcoming.days:30}")
     private int maxUpcomingDays;
 
     @Override

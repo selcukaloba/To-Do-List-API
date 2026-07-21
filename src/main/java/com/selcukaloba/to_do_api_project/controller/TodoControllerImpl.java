@@ -28,8 +28,10 @@ public class TodoControllerImpl implements ITodoController {
 
     @GetMapping(path = "/all")
     @Override
-    public List<TodoResponse> getAllTodo() {
-        return todoService.getAllTodo();
+    public List<TodoResponse> getAllTodo(Principal principal)
+    {
+        String loginuser = principal.getName();
+        return todoService.getAllTodo(loginuser);
     }
 
     @PutMapping(path = "/update/{id}")

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ITodoService {
     public TodoResponse createTodo(TodoCreateRequest request, String username);
-    public List<TodoResponse> getAllTodo();
+    public List<TodoResponse> getAllTodo(String username);
     public TodoResponse updateTodo(Long id, TodoUpdateRequest request);
     public void deleteTodo(Long id);
     public List<TodoResponse>getUpcomingReminders(int days);
