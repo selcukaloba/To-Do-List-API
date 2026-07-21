@@ -13,7 +13,7 @@ public interface ITodoController {
     List<TodoResponse> getAllTodo(Principal principal);
     TodoResponse updateTodo(Long id, TodoUpdateRequest request);
     void deleteTodo(Long id);
-    List<TodoResponse>getUpcomingReminders(int days);
+    List<TodoResponse>getUpcomingReminders(Principal principal, int days);
     void shareTodoWithFriend(Long id, Principal principal, String friendUsername);
     public List<TodoResponse> getSharedTodos(Principal principal);
     List<TodoShareRequestResponse>getPendingShareRequests(Principal principal);

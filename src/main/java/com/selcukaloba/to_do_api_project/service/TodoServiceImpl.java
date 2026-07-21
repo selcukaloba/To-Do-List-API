@@ -88,7 +88,7 @@ public class TodoServiceImpl implements ITodoService{
     private int maxUpcomingDays;
 
     @Override
-    public List<TodoResponse> getUpcomingReminders(int days) {
+    public List<TodoResponse> getUpcomingReminders(String username, int days) {
 
         if(days<0 || days>maxUpcomingDays)
         {
@@ -99,7 +99,7 @@ public class TodoServiceImpl implements ITodoService{
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime targetTime = now.plusDays(days);
 
-        List<Todo> todoList = todoRepository.findByIsCompletedFalseAndReminderDateBetween(now, targetTime);
+        List<Todo> todoList = todoRepository.findUpcomingRemindersByUser(now, targetTime, username);
         List<TodoResponse> responseList = new ArrayList<>();
 
         for(Todo todo : todoList)

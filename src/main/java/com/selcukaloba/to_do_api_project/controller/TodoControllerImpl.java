@@ -48,8 +48,9 @@ public class TodoControllerImpl implements ITodoController {
 
     @GetMapping(path = "/upcomings")
     @Override
-    public List<TodoResponse> getUpcomingReminders(@RequestParam(name = "days", required = false, defaultValue = "7") int days) {
-        return todoService.getUpcomingReminders(days);
+    public List<TodoResponse> getUpcomingReminders(Principal prinicpal, @RequestParam(name = "days", required = false, defaultValue = "7") int days) {
+        String loginuser = prinicpal.getName();
+        return todoService.getUpcomingReminders(loginuser, days);
     }
 
     @PostMapping(path = "/share/{id}")
