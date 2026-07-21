@@ -11,12 +11,13 @@ import java.util.List;
 public interface TodoRepository extends JpaRepository<Todo, Long> {
     List<Todo> findByIsCompletedFalseAndReminderDateBetween(LocalDateTime start, LocalDateTime end);
     List<Todo> findByIsCompletedFalse();
-    List<Todo> findByUserUsernameOrSharedUsersUsername(String ownerUsername, String sharedUsername);
-    @Query("SELECT DISTINCT t FROM Todo t LEFT JOIN t.sharedUsers su WHERE t.user.username = :username OR su.username = :username")
-    List<Todo> findAllTodosByOwnerOrSharedUser(@Param("username")String username);
-    @Query("SELECT t FROM Todo t WHERE t.isCompleted = false " +
+    @Query("SELECT DISTINCT t FROM Todo t LEFT JOIN TodoShare ts ON ts.todo = t " +
+            "WHERE t.user.username = :username OR ts.sharedUser.username = :username")
+    List<Todo> findAllTodosByOwnerOrSharedUser(@Param("username") String username);
+    @Query("SELECT DISTINCT t FROM Todo t LEFT JOIN TodoShare ts ON ts.todo = t " +
+            "WHERE t.isCompleted = false " +
             "AND t.reminderDate BETWEEN :startDate AND :endDate " +
-            "AND (t.user.username = :username OR EXISTS (SELECT su FROM t.sharedUsers su WHERE su.username = :username))")
+            "AND (t.user.username = :username OR ts.sharedUser.username = :username)")
     List<Todo> findUpcomingRemindersByUser(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
