@@ -12,7 +12,7 @@ public interface ITodoService {
     public List<TodoResponse> getAllTodo(String username);
     public TodoResponse updateTodo(Long id, TodoUpdateRequest request);
     public void deleteTodo(Long id);
-    public List<TodoResponse>getUpcomingReminders(int days);
+    public List<TodoResponse>getUpcomingReminders(String username, int days);
     void shareTodoWithFriend(Long id, String ownerUsername, String friendUsername);
     List<TodoResponse>getSharedTodos(String username);
     List<TodoShareRequestResponse>getPendingShareRequests(String username);

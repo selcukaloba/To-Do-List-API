@@ -14,5 +14,13 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
     List<Todo> findByUserUsernameOrSharedUsersUsername(String ownerUsername, String sharedUsername);
     @Query("SELECT DISTINCT t FROM Todo t LEFT JOIN t.sharedUsers su WHERE t.user.username = :username OR su.username = :username")
     List<Todo> findAllTodosByOwnerOrSharedUser(@Param("username")String username);
+    @Query("SELECT t FROM Todo t WHERE t.isCompleted = false " +
+            "AND t.reminderDate BETWEEN :startDate AND :endDate " +
+            "AND (t.user.username = :username OR EXISTS (SELECT su FROM t.sharedUsers su WHERE su.username = :username))")
+    List<Todo> findUpcomingRemindersByUser(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("username") String username
+    );
     List<Todo> findByUserUsername(String username);
 }
