@@ -5,6 +5,7 @@ import com.selcukaloba.to_do_api_project.dto.todo.TodoResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.TodoShareRequestResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.TodoUpdateRequest;
 import com.selcukaloba.to_do_api_project.entity.Todo;
+import com.selcukaloba.to_do_api_project.entity.TodoShare;
 import com.selcukaloba.to_do_api_project.entity.TodoShareRequest;
 import com.selcukaloba.to_do_api_project.entity.User;
 import com.selcukaloba.to_do_api_project.enums.TodoShareStatus;
@@ -12,6 +13,7 @@ import com.selcukaloba.to_do_api_project.exception.BaseException;
 import com.selcukaloba.to_do_api_project.exception.ErrorMessage;
 import com.selcukaloba.to_do_api_project.exception.MessageType;
 import com.selcukaloba.to_do_api_project.repository.TodoRepository;
+import com.selcukaloba.to_do_api_project.repository.TodoShareRepository;
 import com.selcukaloba.to_do_api_project.repository.TodoShareRequestRepository;
 import com.selcukaloba.to_do_api_project.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +35,8 @@ public class TodoServiceImpl implements ITodoService{
     private UserRepository userRepository;
     @Autowired
     private TodoShareRequestRepository todoShareRequestRepository;
+    @Autowired
+    private TodoShareRepository todoShareRepository;
 
     @Override
     public TodoResponse createTodo(TodoCreateRequest request, String username) {
@@ -127,7 +131,7 @@ public class TodoServiceImpl implements ITodoService{
             throw new RuntimeException("You can only share todo with your friends!");
         }
 
-        if(todo.getSharedUsers().contains(friend))
+        if(todoShareRepository.existsByTodoAndSharedUser(todo, friend))
         {
             throw new RuntimeException("Already shared!");
         }
@@ -151,7 +155,7 @@ public class TodoServiceImpl implements ITodoService{
 
     @Override
     public List<TodoResponse> getSharedTodos(String username) {
-        List<Todo> todos = todoRepository.findByUserUsernameOrSharedUsersUsername(username, username);
+        List<Todo> todos = todoRepository.findAllTodosByOwnerOrSharedUser(username);
 
         List<TodoResponse> responseList = new ArrayList<>();
 
@@ -183,8 +187,14 @@ public class TodoServiceImpl implements ITodoService{
         TodoShareRequest todoShareRequest = todoShareRequestRepository.findById(requestId).orElseThrow(()->new RuntimeException("Share request could not be found!"));
         Todo todo = todoShareRequest.getTodo();
         User receiver = todoShareRequest.getReceiver();
-        todo.getSharedUsers().add(receiver);
-        todoRepository.save(todo);
+        User sender = todoShareRequest.getSender();
+
+        TodoShare sharedTodo = new TodoShare();
+        sharedTodo.setTodo(todo);
+        sharedTodo.setSharedUser(receiver);
+        sharedTodo.setSharedBy(sender);
+
+        todoShareRepository.save(sharedTodo);
         todoShareRequestRepository.delete(todoShareRequest);
     }
 
