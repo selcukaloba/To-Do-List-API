@@ -41,7 +41,7 @@ public class TodoServiceImpl implements ITodoService{
 
     @Override
     public TodoResponse createTodo(TodoCreateRequest request, String username) {
-        User owner = userRepository.findByUsername(username).orElseThrow(()->new BaseException(new ErrorMessage("Username: " + username, MessageType.USERNAME_NOT_FOUND)));
+        User owner = userRepository.findByUsername(username).orElseThrow(()->new BaseException(new ErrorMessage( username, MessageType.USERNAME_NOT_FOUND)));
 
         TodoResponse response = new TodoResponse();
         Todo todo = new Todo();
@@ -97,7 +97,7 @@ public class TodoServiceImpl implements ITodoService{
 
         if(days<0 || days>maxUpcomingDays)
         {
-            throw new BaseException(new ErrorMessage("Requested days: "+ days + ", Max allowed: "+ maxUpcomingDays, MessageType.INVALID_DAY_RANGE));
+            throw new BaseException(new ErrorMessage("Requested: "+ days + ", Max: "+ maxUpcomingDays, MessageType.INVALID_DAY_RANGE));
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -122,19 +122,19 @@ public class TodoServiceImpl implements ITodoService{
 
         if(!ownerUsername.equals(todo.getUser().getUsername()))
         {
-            throw new BaseException(new ErrorMessage("User " + ownerUsername + " is not owner of Todo ID: " +  id, MessageType.NOT_TODO_OWNER));
+            throw new BaseException(new ErrorMessage("Todo ID: " +  id, MessageType.NOT_TODO_OWNER));
         }
 
-        User friend = userRepository.findByUsername(friendUsername).orElseThrow(()-> new BaseException(new ErrorMessage("Friend name: "+ friendUsername, MessageType.FRIEND_NOT_FOUND)));
+        User friend = userRepository.findByUsername(friendUsername).orElseThrow(()-> new BaseException(new ErrorMessage(friendUsername, MessageType.FRIEND_NOT_FOUND)));
 
         if(!todo.getUser().getFriends().contains(friend))
         {
-            throw new BaseException(new ErrorMessage("Target: " + friendUsername, MessageType.NOT_FRIENDS));
+            throw new BaseException(new ErrorMessage(friendUsername, MessageType.NOT_FRIENDS));
         }
 
         if(todoShareRepository.existsByTodoAndSharedUser(todo, friend))
         {
-            throw new BaseException(new ErrorMessage("Todo ID: "+ id + " already shared with" + friendUsername, MessageType.ALREADY_SHARED));
+            throw new BaseException(new ErrorMessage("Todo ID: "+ id + ", User: " + friendUsername, MessageType.ALREADY_SHARED));
         }
 
         boolean hasPendingShare = todoShareRequestRepository
@@ -143,7 +143,7 @@ public class TodoServiceImpl implements ITodoService{
                 .anyMatch(req -> req.getTodo().getId().equals(id) && req.getSender().getUsername().equals(ownerUsername));
 
         if (hasPendingShare) {
-            throw new BaseException(new ErrorMessage("Pending request is existed for: " + friendUsername, MessageType.SHARE_REQUEST_PENDING));
+            throw new BaseException(new ErrorMessage(friendUsername, MessageType.SHARE_REQUEST_PENDING));
         }
 
         TodoShareRequest shareRequest = new TodoShareRequest();
@@ -184,6 +184,7 @@ public class TodoServiceImpl implements ITodoService{
     }
 
     @Override
+    @Transactional
     public void acceptShareRequest(Long requestId) {
         TodoShareRequest todoShareRequest = todoShareRequestRepository.findById(requestId).orElseThrow(()->new BaseException(new ErrorMessage("Request ID: " + requestId, MessageType.SHARE_REQUEST_NOT_FOUND)));
         Todo todo = todoShareRequest.getTodo();

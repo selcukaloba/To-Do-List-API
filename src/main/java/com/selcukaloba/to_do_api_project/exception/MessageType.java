@@ -23,7 +23,10 @@ public enum MessageType {
     NOT_FRIENDS("3002", "share.not_friends"),
     ALREADY_SHARED("3003", "share.already_shared"),
     SHARE_REQUEST_PENDING("3004", "share.request_pending"),
+    CANNOT_SEND_TO_SELF("3006", "friend.cannot_send_to_self"),
     SHARE_REQUEST_NOT_FOUND("3005", "share.request_not_found"),
+    ALREADY_FRIENDS("3007", "friends.already_friends"),
+    FRIEND_REQUEST_NOT_FOUND("3008", "friends.request_not_found"),
 
     GENERAL_EXCEPTION("9999", "general.exception");
 
