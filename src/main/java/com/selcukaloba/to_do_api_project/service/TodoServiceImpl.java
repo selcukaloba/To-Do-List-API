@@ -20,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -115,6 +116,7 @@ public class TodoServiceImpl implements ITodoService{
     }
 
     @Override
+    @Transactional
     public void shareTodoWithFriend(Long id, String ownerUsername, String friendUsername) {
         Todo todo = todoRepository.findById(id).orElseThrow(()->new BaseException(new ErrorMessage("Todo ID: "+ id, MessageType.TODO_NOT_FOUND)));
 
