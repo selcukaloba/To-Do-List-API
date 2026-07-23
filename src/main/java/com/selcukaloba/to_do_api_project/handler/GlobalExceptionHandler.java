@@ -3,6 +3,8 @@ package com.selcukaloba.to_do_api_project.handler;
 import com.selcukaloba.to_do_api_project.exception.BaseException;
 import com.selcukaloba.to_do_api_project.exception.ErrorMessage;
 import com.selcukaloba.to_do_api_project.exception.MessageType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -19,15 +21,23 @@ import java.util.*;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @Autowired
+    private MessageSource messageSource;
+
     //service errors
     @ExceptionHandler(value = {BaseException.class})
-    public ResponseEntity<ApiError<?>> handleBaseException(BaseException ex, WebRequest request)
+    public ResponseEntity<ApiError<?>> handleBaseException(BaseException ex, WebRequest request, Locale locale)
     {
         ErrorMessage errorMessage = ex.getErrorMessage();
         String code = errorMessage.getMessageType().getCode();
-        String detailMessage = errorMessage.generateErrorMessage();
 
-        return ResponseEntity.badRequest().body(createApiError(HttpStatus.BAD_REQUEST, code, detailMessage, request));
+        String messageKey = errorMessage.getMessageType().getMessage();
+        String localizedMessage = messageSource.getMessage(messageKey, null, locale);
+        if(errorMessage.getDetail()!=null && !errorMessage.getDetail().isEmpty())
+        {
+            localizedMessage += " : " + errorMessage.getDetail();
+        }
+        return ResponseEntity.badRequest().body(createApiError(HttpStatus.BAD_REQUEST, code, localizedMessage, request));
     }
 
     //validation errors
@@ -56,10 +66,14 @@ public class GlobalExceptionHandler {
 
     //other errors
     @ExceptionHandler(value = {Exception.class})
-    public ResponseEntity<ApiError<String>> handleGeneralException(Exception ex, WebRequest request)
+    public ResponseEntity<ApiError<String>> handleGeneralException(Exception ex, WebRequest request, Locale locale)
     {
         String generalCode = MessageType.GENERAL_EXCEPTION.getCode();
-        String message = ex.getMessage() != null ? ex.getMessage() : MessageType.GENERAL_EXCEPTION.getMessage();
+
+        String messageKey = MessageType.GENERAL_EXCEPTION.getMessage();
+        String localizedMessage = messageSource.getMessage(messageKey, null, locale);
+
+        String message = ex.getMessage() != null ? ex.getMessage() : localizedMessage;
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -5,27 +5,27 @@ import lombok.Getter;
 @Getter
 public enum MessageType {
     //validation errors
-    VALIDATION_ERROR("1000", "Input validation failed!"),
+    VALIDATION_ERROR("1000", "validation.error"),
 
     //authentication errors
-    NO_RECORD_EXISTS("1001", "No such record!"),
-    USERNAME_NOT_FOUND("1002", "No such user!"),
-    USER_ALREADY_EXISTS("1003", "User already exists!"),
+    NO_RECORD_EXISTS("1001", "user.no_record_exists"),
+    USERNAME_NOT_FOUND("1002", "user.not_found"),
+    USER_ALREADY_EXISTS("1003", "user.already_exists"),
 
     //todos errors
-    INVALID_DAY_RANGE("2001", "Invalid day range!"),
-    INVALID_DATE_ORDER("2002", "Reminder date cannot be after than due date!"),
-    TODO_NOT_FOUND("2003", "Todo could not be found!"),
-    NOT_TODO_OWNER("2004", "You are not owner of the Todo!"),
+    INVALID_DAY_RANGE("2001", "todo.invalid_day_range"),
+    INVALID_DATE_ORDER("2002", "todo.invalid_date_order"),
+    TODO_NOT_FOUND("2003", "todo.not_found"),
+    NOT_TODO_OWNER("2004", "todo.not_owner"),
 
     //friendship and share errors
-    FRIEND_NOT_FOUND("3001", "Friend could not be found!"),
-    NOT_FRIENDS("3002", "Share is only can be done with friends!"),
-    ALREADY_SHARED("3003", "This todo already shared!"),
-    SHARE_REQUEST_PENDING("3004", "Share request already pending!"),
-    SHARE_REQUEST_NOT_FOUND("3005", "Share request could not be found!"),
+    FRIEND_NOT_FOUND("3001", "friend.not_found"),
+    NOT_FRIENDS("3002", "share.not_friends"),
+    ALREADY_SHARED("3003", "share.already_shared"),
+    SHARE_REQUEST_PENDING("3004", "share.request_pending"),
+    SHARE_REQUEST_NOT_FOUND("3005", "share.request_not_found"),
 
-    GENERAL_EXCEPTION("9999", "General exception!");
+    GENERAL_EXCEPTION("9999", "general.exception");
 
     private String code, message;
 
