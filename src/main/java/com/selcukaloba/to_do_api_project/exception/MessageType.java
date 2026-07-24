@@ -27,6 +27,7 @@ public enum MessageType {
     SHARE_REQUEST_NOT_FOUND("3005", "share.request_not_found"),
     ALREADY_FRIENDS("3007", "friends.already_friends"),
     FRIEND_REQUEST_NOT_FOUND("3008", "friends.request_not_found"),
+    FRIEND_REQUEST_ALREADY_PENDING("3009", "friend.request_already_pending"),
 
     GENERAL_EXCEPTION("9999", "general.exception");
 

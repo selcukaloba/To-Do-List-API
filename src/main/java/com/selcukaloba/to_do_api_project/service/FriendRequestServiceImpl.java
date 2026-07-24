@@ -40,6 +40,12 @@ public class FriendRequestServiceImpl implements IFriendRequestService{
         {
             throw new BaseException(new ErrorMessage(receiverUsername, MessageType.ALREADY_FRIENDS));
         }
+
+        boolean hasPendingRequests = friendRequestRepository.existsBySenderAndReceiverAndStatus(sender, receiver, FriendRequestStatus.PENDING);
+        if(hasPendingRequests)
+        {
+            throw new BaseException(new ErrorMessage(receiverUsername, MessageType.FRIEND_REQUEST_ALREADY_PENDING));
+        }
         FriendRequest friendRequest = new FriendRequest();
         friendRequest.setSender(sender);
         friendRequest.setReceiver(receiver);
