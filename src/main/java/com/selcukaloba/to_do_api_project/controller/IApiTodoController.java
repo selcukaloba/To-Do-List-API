@@ -11,8 +11,8 @@ import java.util.List;
 public interface IApiTodoController {
     ApiTodoResponse createTodo(ApiTodoCreateRequest request, Principal principal);
     List<ApiTodoResponse> getAllTodo(Principal principal);
-    ApiTodoResponse updateTodo(Long id, ApiTodoUpdateRequest request);
-    void deleteTodo(Long id);
+    ApiTodoResponse updateTodo(Long id, ApiTodoUpdateRequest request, Principal principal);
+    void deleteTodo(Long id, Principal principal);
     List<ApiTodoResponse>getUpcomingReminders(Principal principal, int days);
     void shareTodoWithFriend(Long id, Principal principal, String friendUsername);
     public List<ApiTodoResponse> getSharedTodos(Principal principal);

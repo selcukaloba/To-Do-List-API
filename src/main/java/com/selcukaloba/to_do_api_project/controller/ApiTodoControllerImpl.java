@@ -36,14 +36,17 @@ public class ApiTodoControllerImpl implements IApiTodoController {
 
     @PutMapping(path = "/update/{id}")
     @Override
-    public ApiTodoResponse updateTodo(@PathVariable(name = "id") Long id, @Valid @RequestBody ApiTodoUpdateRequest request) {
-        return todoService.updateTodo(id, request);
+    public ApiTodoResponse updateTodo(@PathVariable(name = "id") Long id, @Valid @RequestBody ApiTodoUpdateRequest request, Principal principal) {
+        String loginuser = principal.getName();
+        return todoService.updateTodo(id, request, loginuser);
     }
 
     @DeleteMapping(path = "/delete/{id}")
     @Override
-    public void deleteTodo(@PathVariable(name = "id") Long id) {
-        todoService.deleteTodo(id);
+    public void deleteTodo(@PathVariable(name = "id") Long id, Principal principal)
+    {
+        String loginuser = principal.getName();
+        todoService.deleteTodo(id, loginuser);
     }
 
     @GetMapping(path = "/upcomings")

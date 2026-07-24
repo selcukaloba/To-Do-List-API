@@ -10,8 +10,8 @@ import java.util.List;
 public interface ITodoService {
     public ApiTodoResponse createTodo(ApiTodoCreateRequest request, String username);
     public List<ApiTodoResponse> getAllTodo(String username);
-    public ApiTodoResponse updateTodo(Long id, ApiTodoUpdateRequest request);
-    public void deleteTodo(Long id);
+    public ApiTodoResponse updateTodo(Long id, ApiTodoUpdateRequest request, String username);
+    public void deleteTodo(Long id, String username);
     public List<ApiTodoResponse>getUpcomingReminders(String username, int days);
     void shareTodoWithFriend(Long id, String ownerUsername, String friendUsername);
     List<ApiTodoResponse>getSharedTodos(String username);
