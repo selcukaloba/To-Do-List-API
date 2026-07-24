@@ -189,8 +189,13 @@ public class TodoServiceImpl implements ITodoService{
 
     @Override
     @Transactional
-    public void acceptShareRequest(Long requestId) {
+    public void acceptShareRequest(Long requestId, String username) {
         TodoShareRequest todoShareRequest = todoShareRequestRepository.findById(requestId).orElseThrow(()->new BaseException(new ErrorMessage("Request ID: " + requestId, MessageType.SHARE_REQUEST_NOT_FOUND)));
+
+        if(!todoShareRequest.getReceiver().getUsername().equals(username))
+        {
+            throw new BaseException(new ErrorMessage("Request ID: "+ requestId, MessageType.NOT_TODO_OWNER));
+        }
         Todo todo = todoShareRequest.getTodo();
         User receiver = todoShareRequest.getReceiver();
         User sender = todoShareRequest.getSender();
@@ -205,8 +210,13 @@ public class TodoServiceImpl implements ITodoService{
     }
 
     @Override
-    public void rejectShareRequest(Long requestId) {
+    @Transactional
+    public void rejectShareRequest(Long requestId, String username) {
         TodoShareRequest todoShareRequest = todoShareRequestRepository.findById(requestId).orElseThrow(()->new BaseException(new ErrorMessage("Request ID: " + requestId, MessageType.SHARE_REQUEST_NOT_FOUND)));
+        if(!todoShareRequest.getReceiver().getUsername().equals(username))
+        {
+            throw new BaseException(new ErrorMessage("Request ID: " + requestId, MessageType.NOT_TODO_OWNER));
+        }
         todoShareRequestRepository.delete(todoShareRequest);
     }
 }
