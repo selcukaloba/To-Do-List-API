@@ -66,9 +66,15 @@ public class TodoServiceImpl implements ITodoService{
     }
 
     @Override
-    public ApiTodoResponse updateTodo(Long id, ApiTodoUpdateRequest request) {
+    public ApiTodoResponse updateTodo(Long id, ApiTodoUpdateRequest request, String username) {
         Todo todo = todoRepository.findById(id)
                 .orElseThrow(() -> new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NO_RECORD_EXISTS)));
+
+        if(!todo.getUser().getUsername().equals(username))
+        {
+            throw new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NOT_TODO_OWNER));
+        }
+
             BeanUtils.copyProperties(request, todo);
             todo.setId(id);//id kopyalanırken bozulmasın
             Todo updatedTodo = todoRepository.save(todo);
@@ -78,15 +84,13 @@ public class TodoServiceImpl implements ITodoService{
     }
 
     @Override
-    public void deleteTodo(Long id) {
-        if(todoRepository.existsById(id))
+    public void deleteTodo(Long id, String username) {
+        Todo todo = todoRepository.findById(id).orElseThrow(()->new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NO_RECORD_EXISTS)));
+        if(!todo.getUser().getUsername().equals(username))
         {
-            todoRepository.deleteById(id);
+            throw new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NOT_TODO_OWNER));
         }
-        else
-        {
-            throw new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NO_RECORD_EXISTS));
-        }
+        todoRepository.delete(todo);
     }
 
     @Value("${todo.max.upcoming.days:30}")
