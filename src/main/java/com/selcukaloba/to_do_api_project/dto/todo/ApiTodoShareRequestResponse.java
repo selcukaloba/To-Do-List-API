@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TodoShareRequestResponse {
+public class ApiTodoShareRequestResponse {
     private Long id;
     private String senderUsername;
     private String receiverUsername;

@@ -1,9 +1,9 @@
 package com.selcukaloba.to_do_api_project.controller;
 
-import com.selcukaloba.to_do_api_project.dto.todo.TodoCreateRequest;
-import com.selcukaloba.to_do_api_project.dto.todo.TodoResponse;
-import com.selcukaloba.to_do_api_project.dto.todo.TodoShareRequestResponse;
-import com.selcukaloba.to_do_api_project.dto.todo.TodoUpdateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoCreateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoResponse;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoShareRequestResponse;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoUpdateRequest;
 import com.selcukaloba.to_do_api_project.service.ITodoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,21 +14,21 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/rest/api/todo")
-public class TodoControllerImpl implements ITodoController {
+public class ApiTodoControllerImpl implements IApiTodoController {
 
     @Autowired
     private ITodoService todoService;
 
     @PostMapping(path = "/create")
     @Override
-    public TodoResponse createTodo(@Valid @RequestBody TodoCreateRequest request, Principal principal) {
+    public ApiTodoResponse createTodo(@Valid @RequestBody ApiTodoCreateRequest request, Principal principal) {
         String loginuser = principal.getName();
         return todoService.createTodo(request, loginuser);
     }
 
     @GetMapping(path = "/all")
     @Override
-    public List<TodoResponse> getAllTodo(Principal principal)
+    public List<ApiTodoResponse> getAllTodo(Principal principal)
     {
         String loginuser = principal.getName();
         return todoService.getAllTodo(loginuser);
@@ -36,7 +36,7 @@ public class TodoControllerImpl implements ITodoController {
 
     @PutMapping(path = "/update/{id}")
     @Override
-    public TodoResponse updateTodo(@PathVariable(name = "id") Long id,@Valid @RequestBody TodoUpdateRequest request) {
+    public ApiTodoResponse updateTodo(@PathVariable(name = "id") Long id, @Valid @RequestBody ApiTodoUpdateRequest request) {
         return todoService.updateTodo(id, request);
     }
 
@@ -48,7 +48,7 @@ public class TodoControllerImpl implements ITodoController {
 
     @GetMapping(path = "/upcomings")
     @Override
-    public List<TodoResponse> getUpcomingReminders(Principal prinicpal, @RequestParam(name = "days", required = false, defaultValue = "7") int days) {
+    public List<ApiTodoResponse> getUpcomingReminders(Principal prinicpal, @RequestParam(name = "days", required = false, defaultValue = "7") int days) {
         String loginuser = prinicpal.getName();
         return todoService.getUpcomingReminders(loginuser, days);
     }
@@ -62,14 +62,14 @@ public class TodoControllerImpl implements ITodoController {
 
     @GetMapping(path = "/shared/all")
     @Override
-    public List<TodoResponse> getSharedTodos(Principal principal) {
+    public List<ApiTodoResponse> getSharedTodos(Principal principal) {
         String loginuser = principal.getName();
         return todoService.getSharedTodos(loginuser);
     }
 
     @GetMapping(path = "/share/pending")
     @Override
-    public List<TodoShareRequestResponse> getPendingShareRequests(Principal principal) {
+    public List<ApiTodoShareRequestResponse> getPendingShareRequests(Principal principal) {
         String loginuser = principal.getName();
         return todoService.getPendingShareRequests(loginuser);
     }

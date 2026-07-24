@@ -1,6 +1,6 @@
 package com.selcukaloba.to_do_api_project.service;
 
-import com.selcukaloba.to_do_api_project.dto.FriendRequestResponse;
+import com.selcukaloba.to_do_api_project.dto.ApiFriendRequestResponse;
 import com.selcukaloba.to_do_api_project.entity.FriendRequest;
 import com.selcukaloba.to_do_api_project.entity.User;
 import com.selcukaloba.to_do_api_project.enums.FriendRequestStatus;
@@ -48,10 +48,10 @@ public class FriendRequestServiceImpl implements IFriendRequestService{
     }
 
     @Override
-    public List<FriendRequestResponse> getPendingRequests(String username) {
+    public List<ApiFriendRequestResponse> getPendingRequests(String username) {
         List<FriendRequest> requests = friendRequestRepository.findByReceiverUsernameAndStatus(username, FriendRequestStatus.PENDING);
         return requests.stream()
-                .map(req->new FriendRequestResponse(
+                .map(req->new ApiFriendRequestResponse(
                         req.getId(),
                         req.getSender().getUsername(),
                         req.getReceiver().getUsername(),
