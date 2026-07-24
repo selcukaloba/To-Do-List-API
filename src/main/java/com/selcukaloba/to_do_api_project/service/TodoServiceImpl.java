@@ -1,9 +1,9 @@
 package com.selcukaloba.to_do_api_project.service;
 
-import com.selcukaloba.to_do_api_project.dto.todo.TodoCreateRequest;
-import com.selcukaloba.to_do_api_project.dto.todo.TodoResponse;
-import com.selcukaloba.to_do_api_project.dto.todo.TodoShareRequestResponse;
-import com.selcukaloba.to_do_api_project.dto.todo.TodoUpdateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoCreateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoResponse;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoShareRequestResponse;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoUpdateRequest;
 import com.selcukaloba.to_do_api_project.entity.Todo;
 import com.selcukaloba.to_do_api_project.entity.TodoShare;
 import com.selcukaloba.to_do_api_project.entity.TodoShareRequest;
@@ -40,10 +40,10 @@ public class TodoServiceImpl implements ITodoService{
     private TodoShareRepository todoShareRepository;
 
     @Override
-    public TodoResponse createTodo(TodoCreateRequest request, String username) {
+    public ApiTodoResponse createTodo(ApiTodoCreateRequest request, String username) {
         User owner = userRepository.findByUsername(username).orElseThrow(()->new BaseException(new ErrorMessage( username, MessageType.USERNAME_NOT_FOUND)));
 
-        TodoResponse response = new TodoResponse();
+        ApiTodoResponse response = new ApiTodoResponse();
         Todo todo = new Todo();
         BeanUtils.copyProperties(request, todo);
         todo.setUser(owner);
@@ -53,12 +53,12 @@ public class TodoServiceImpl implements ITodoService{
     }
 
     @Override
-    public List<TodoResponse> getAllTodo(String username) {
+    public List<ApiTodoResponse> getAllTodo(String username) {
         List<Todo> todoList = todoRepository.findAllTodosByOwnerOrSharedUser(username);
-        List<TodoResponse> responseList = new ArrayList<>();
+        List<ApiTodoResponse> responseList = new ArrayList<>();
         for(Todo todo: todoList)
         {
-            TodoResponse dto = new TodoResponse();
+            ApiTodoResponse dto = new ApiTodoResponse();
             BeanUtils.copyProperties(todo, dto);
             responseList.add(dto);
         }
@@ -66,13 +66,13 @@ public class TodoServiceImpl implements ITodoService{
     }
 
     @Override
-    public TodoResponse updateTodo(Long id, TodoUpdateRequest request) {
+    public ApiTodoResponse updateTodo(Long id, ApiTodoUpdateRequest request) {
         Todo todo = todoRepository.findById(id)
                 .orElseThrow(() -> new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NO_RECORD_EXISTS)));
             BeanUtils.copyProperties(request, todo);
             todo.setId(id);//id kopyalanırken bozulmasın
             Todo updatedTodo = todoRepository.save(todo);
-            TodoResponse response = new TodoResponse();
+            ApiTodoResponse response = new ApiTodoResponse();
             BeanUtils.copyProperties(updatedTodo, response);
             return response;
     }
@@ -93,7 +93,7 @@ public class TodoServiceImpl implements ITodoService{
     private int maxUpcomingDays;
 
     @Override
-    public List<TodoResponse> getUpcomingReminders(String username, int days) {
+    public List<ApiTodoResponse> getUpcomingReminders(String username, int days) {
 
         if(days<0 || days>maxUpcomingDays)
         {
@@ -104,11 +104,11 @@ public class TodoServiceImpl implements ITodoService{
         LocalDateTime targetTime = now.plusDays(days);
 
         List<Todo> todoList = todoRepository.findUpcomingRemindersByUser(now, targetTime, username);
-        List<TodoResponse> responseList = new ArrayList<>();
+        List<ApiTodoResponse> responseList = new ArrayList<>();
 
         for(Todo todo : todoList)
         {
-            TodoResponse dto = new TodoResponse();
+            ApiTodoResponse dto = new ApiTodoResponse();
             BeanUtils.copyProperties(todo, dto);
             responseList.add(dto);
         }
@@ -155,14 +155,14 @@ public class TodoServiceImpl implements ITodoService{
     }
 
     @Override
-    public List<TodoResponse> getSharedTodos(String username) {
+    public List<ApiTodoResponse> getSharedTodos(String username) {
         List<Todo> todos = todoRepository.findAllTodosByOwnerOrSharedUser(username);
 
-        List<TodoResponse> responseList = new ArrayList<>();
+        List<ApiTodoResponse> responseList = new ArrayList<>();
 
         for(Todo todo : todos)
         {
-            TodoResponse response = new TodoResponse();
+            ApiTodoResponse response = new ApiTodoResponse();
             BeanUtils.copyProperties(todo, response);
             responseList.add(response);
         }
@@ -170,10 +170,10 @@ public class TodoServiceImpl implements ITodoService{
     }
 
     @Override
-    public List<TodoShareRequestResponse> getPendingShareRequests(String username) {
+    public List<ApiTodoShareRequestResponse> getPendingShareRequests(String username) {
         List<TodoShareRequest> requests = todoShareRequestRepository.findByReceiverUsernameAndStatus(username, TodoShareStatus.PENDING);
         return requests.stream()
-                .map(req->new TodoShareRequestResponse(
+                .map(req->new ApiTodoShareRequestResponse(
                         req.getId(),
                         req.getSender().getUsername(),
                         req.getReceiver().getUsername(),

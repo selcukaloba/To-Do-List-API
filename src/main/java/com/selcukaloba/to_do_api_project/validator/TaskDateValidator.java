@@ -1,7 +1,7 @@
 package com.selcukaloba.to_do_api_project.validator;
 
-import com.selcukaloba.to_do_api_project.dto.todo.TodoCreateRequest;
-import com.selcukaloba.to_do_api_project.dto.todo.TodoUpdateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoCreateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoUpdateRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -13,16 +13,16 @@ public class TaskDateValidator implements ConstraintValidator<TaskDateMatch, Obj
         LocalDateTime reminderDate = null;
         LocalDateTime dueDate = null;
 
-        if(value instanceof TodoCreateRequest)
+        if(value instanceof ApiTodoCreateRequest)
         {
-            TodoCreateRequest createRequest = (TodoCreateRequest) value;
+            ApiTodoCreateRequest createRequest = (ApiTodoCreateRequest) value;
             reminderDate = createRequest.getReminderDate();
             dueDate = createRequest.getDueDate();
         }
 
-        else if(value instanceof TodoUpdateRequest)
+        else if(value instanceof ApiTodoUpdateRequest)
         {
-            TodoUpdateRequest updateRequest = (TodoUpdateRequest) value;
+            ApiTodoUpdateRequest updateRequest = (ApiTodoUpdateRequest) value;
             reminderDate = updateRequest.getReminderDate();
             dueDate = updateRequest.getDueDate();
         }

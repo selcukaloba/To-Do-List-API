@@ -1,9 +1,7 @@
 package com.selcukaloba.to_do_api_project.controller;
 
-import com.selcukaloba.to_do_api_project.dto.FriendRequestResponse;
-import com.selcukaloba.to_do_api_project.entity.FriendRequest;
+import com.selcukaloba.to_do_api_project.dto.ApiFriendRequestResponse;
 import com.selcukaloba.to_do_api_project.service.IFriendRequestService;
-import com.sun.source.tree.IfTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/friends")
-public class FriendRequestControllerImpl implements IFriendRequestController {
+public class ApiFriendRequestControllerImpl implements IApiFriendRequestController {
 
     @Autowired
     private IFriendRequestService friendRequestService;
@@ -26,7 +24,7 @@ public class FriendRequestControllerImpl implements IFriendRequestController {
 
     @Override
     @GetMapping(path = "/request/pending")
-    public List<FriendRequestResponse> getPendingRequests(Principal principal) {
+    public List<ApiFriendRequestResponse> getPendingRequests(Principal principal) {
         String loginuser = principal.getName();
         return friendRequestService.getPendingRequests(loginuser);
     }

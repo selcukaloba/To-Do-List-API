@@ -1,22 +1,20 @@
 package com.selcukaloba.to_do_api_project.service;
 
-import com.selcukaloba.to_do_api_project.dto.RegisterRequest;
-import com.selcukaloba.to_do_api_project.dto.UserResponse;
-import com.selcukaloba.to_do_api_project.dto.auth.AuthRequest;
-import com.selcukaloba.to_do_api_project.dto.auth.AuthResponse;
-import com.selcukaloba.to_do_api_project.dto.auth.RefreshTokenRequest;
+import com.selcukaloba.to_do_api_project.dto.ApiRegisterRequest;
+import com.selcukaloba.to_do_api_project.dto.ApiUserResponse;
+import com.selcukaloba.to_do_api_project.dto.auth.ApiAuthRequest;
+import com.selcukaloba.to_do_api_project.dto.auth.ApiAuthResponse;
+import com.selcukaloba.to_do_api_project.dto.auth.ApiRefreshTokenRequest;
 import com.selcukaloba.to_do_api_project.entity.RefreshToken;
 import com.selcukaloba.to_do_api_project.entity.User;
 import com.selcukaloba.to_do_api_project.jwt.JwtService;
 import com.selcukaloba.to_do_api_project.repository.UserRepository;
-import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Optional;
 
@@ -39,10 +37,10 @@ public class AuthServiceImpl implements IAuthService{
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public UserResponse register(RegisterRequest registerRequest)
+    public ApiUserResponse register(ApiRegisterRequest registerRequest)
     {
         User user = new User();
-        UserResponse userResponse = new UserResponse();
+        ApiUserResponse userResponse = new ApiUserResponse();
 
         user.setUsername(registerRequest.getUsername());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
@@ -53,7 +51,7 @@ public class AuthServiceImpl implements IAuthService{
     }
 
     @Override
-    public AuthResponse authenticate(AuthRequest authRequest) {
+    public ApiAuthResponse authenticate(ApiAuthRequest authRequest) {
         try
         {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
@@ -72,15 +70,15 @@ public class AuthServiceImpl implements IAuthService{
         User user = optionalUser.get();
         String accessToken = jwtService.generateToken(user.getUsername());
         String refreshToken = refreshTokenService.createRefreshToken(user);
-        return new AuthResponse(accessToken, refreshToken, user.getUsername());
+        return new ApiAuthResponse(accessToken, refreshToken, user.getUsername());
 
     }
 
     @Override
-    public AuthResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+    public ApiAuthResponse refreshToken(ApiRefreshTokenRequest refreshTokenRequest) {
         RefreshToken dbToken = refreshTokenService.findByRefreshToken(refreshTokenRequest.getRefreshToken());
         User user = dbToken.getUser();
         String newAccessToken = jwtService.generateToken(user.getUsername());
-        return new AuthResponse(newAccessToken, refreshTokenRequest.getRefreshToken(), user.getUsername());
+        return new ApiAuthResponse(newAccessToken, refreshTokenRequest.getRefreshToken(), user.getUsername());
     }
 }

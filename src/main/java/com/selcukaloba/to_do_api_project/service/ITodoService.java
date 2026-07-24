@@ -1,21 +1,21 @@
 package com.selcukaloba.to_do_api_project.service;
 
-import com.selcukaloba.to_do_api_project.dto.todo.TodoCreateRequest;
-import com.selcukaloba.to_do_api_project.dto.todo.TodoResponse;
-import com.selcukaloba.to_do_api_project.dto.todo.TodoShareRequestResponse;
-import com.selcukaloba.to_do_api_project.dto.todo.TodoUpdateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoCreateRequest;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoResponse;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoShareRequestResponse;
+import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoUpdateRequest;
 
 import java.util.List;
 
 public interface ITodoService {
-    public TodoResponse createTodo(TodoCreateRequest request, String username);
-    public List<TodoResponse> getAllTodo(String username);
-    public TodoResponse updateTodo(Long id, TodoUpdateRequest request);
+    public ApiTodoResponse createTodo(ApiTodoCreateRequest request, String username);
+    public List<ApiTodoResponse> getAllTodo(String username);
+    public ApiTodoResponse updateTodo(Long id, ApiTodoUpdateRequest request);
     public void deleteTodo(Long id);
-    public List<TodoResponse>getUpcomingReminders(String username, int days);
+    public List<ApiTodoResponse>getUpcomingReminders(String username, int days);
     void shareTodoWithFriend(Long id, String ownerUsername, String friendUsername);
-    List<TodoResponse>getSharedTodos(String username);
-    List<TodoShareRequestResponse>getPendingShareRequests(String username);
+    List<ApiTodoResponse>getSharedTodos(String username);
+    List<ApiTodoShareRequestResponse>getPendingShareRequests(String username);
     void acceptShareRequest(Long requestId);
     void rejectShareRequest(Long requestId);
 }

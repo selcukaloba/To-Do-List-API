@@ -1,4 +1,4 @@
-package com.selcukaloba.to_do_api_project.dto.auth;
+package com.selcukaloba.to_do_api_project.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponse {
-    private String accessToken;
-    private String refreshToken;
+public class ApiUserResponse {
     private String username;
+    private String email;
+    private Long id;
 }

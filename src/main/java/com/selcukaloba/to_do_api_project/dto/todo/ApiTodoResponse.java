@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TodoResponse {
+public class ApiTodoResponse {
 
     private Long id;
     private String title;

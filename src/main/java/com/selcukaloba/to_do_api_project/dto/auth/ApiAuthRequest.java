@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefreshTokenRequest {
+public class ApiAuthRequest {
     @NotEmpty
-    private  String refreshToken;
+    private String username;
+    @NotEmpty
+    private String password;
 }

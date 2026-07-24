@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @TaskDateMatch
-public class TodoUpdateRequest {
+public class ApiTodoUpdateRequest {
 
     @NotBlank(message = "title cannot be empty!")
     @Size(min =3, max =100, message = "title must be in 3-100 characters!")
