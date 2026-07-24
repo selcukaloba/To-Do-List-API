@@ -17,7 +17,7 @@ public interface IApiTodoController {
     void shareTodoWithFriend(Long id, Principal principal, String friendUsername);
     public List<ApiTodoResponse> getSharedTodos(Principal principal);
     List<ApiTodoShareRequestResponse>getPendingShareRequests(Principal principal);
-    void acceptShareRequest(Long requestId);
-    void rejectShareRequest(Long requestId);
+    void acceptShareRequest(Long requestId, Principal principal);
+    void rejectShareRequest(Long requestId, Principal principal);
 
 }

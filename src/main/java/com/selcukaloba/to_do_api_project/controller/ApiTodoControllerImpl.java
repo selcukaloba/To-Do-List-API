@@ -79,13 +79,15 @@ public class ApiTodoControllerImpl implements IApiTodoController {
 
     @PutMapping(path = "/share/accept/{requestId}")
     @Override
-    public void acceptShareRequest(@PathVariable(name = "requestId") Long requestId) {
-        todoService.acceptShareRequest(requestId);
+    public void acceptShareRequest(@PathVariable(name = "requestId") Long requestId, Principal principal) {
+        String loginuser = principal.getName();
+        todoService.acceptShareRequest(requestId, loginuser);
     }
 
     @PutMapping(path = "/share/reject/{requestId}")
     @Override
-    public void rejectShareRequest(@PathVariable(name = "requestId")Long requestId) {
-        todoService.rejectShareRequest(requestId);
+    public void rejectShareRequest(@PathVariable(name = "requestId")Long requestId, Principal principal) {
+        String loginuser = principal.getName();
+        todoService.rejectShareRequest(requestId, loginuser);
     }
 }

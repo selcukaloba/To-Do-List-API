@@ -16,6 +16,6 @@ public interface ITodoService {
     void shareTodoWithFriend(Long id, String ownerUsername, String friendUsername);
     List<ApiTodoResponse>getSharedTodos(String username);
     List<ApiTodoShareRequestResponse>getPendingShareRequests(String username);
-    void acceptShareRequest(Long requestId);
-    void rejectShareRequest(Long requestId);
+    void acceptShareRequest(Long requestId, String username);
+    void rejectShareRequest(Long requestId, String username);
 }
