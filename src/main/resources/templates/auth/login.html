@@ -86,17 +86,21 @@
 </footer>
 
 <script>
-    document.getElementById('loginForm').addEventListener('submit', async function(e.preventDefault();
-    const usernameInput = document.getElementById('username').value.trim();
-    const passwordInput = document.getElementById('password').value;
-    const errorBanner = document.getElementById('errorBanner');
-    const submitBtn = document.getElementById('submitBtn');
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-    errorBanner.classList.add('hidden);
-    errorBanner.textContent = '';
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span>Processing...</span>';
-    try {
+        const usernameInput = document.getElementById('username').value.trim();
+        const passwordInput = document.getElementById('password').value;
+        const errorBanner = document.getElementById('errorBanner');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Temizlik
+        errorBanner.classList.add('hidden');
+        errorBanner.textContent = '';
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Processing...</span>';
+
+        try {
             const response = await fetch('/auth/authenticate', {
                 method: 'POST',
                 headers: {
@@ -111,19 +115,30 @@
             const data = await response.json();
 
             if (response.ok) {
-                const token = data.accessToken || data.token || (data.payload && data.payload.accessToken);
-                if (token) {
-                    localStorage.setItem('accessToken', token);
+                // Token alma garantisi
+                let token = null;
+                if (data.accessToken) {
+                    token = data.accessToken;
+                } else if (data.token) {
+                    token = data.token;
+                } else if (data.payload && data.payload.accessToken) {
+                    token = data.payload.accessToken;
                 }
 
-                window.location.href = '/dashboard';
+                if (token) {
+                    localStorage.setItem('accessToken', token);
+                    window.location.href = '/dashboard';
+                } else {
+                    throw new Error('Token yanıt içerisinde bulunamadı.');
+                }
             } else {
+                // Hata mesajı çıkarma
                 let errorMsg = 'Invalid username or password.';
-                if (data.exceptionDetails && data.exceptionDetails.message) {
+                if (data && data.exceptionDetails && data.exceptionDetails.message) {
                     errorMsg = typeof data.exceptionDetails.message === 'string'
                         ? data.exceptionDetails.message
                         : JSON.stringify(data.exceptionDetails.message);
-                } else if (data.message) {
+                } else if (data && data.message) {
                     errorMsg = data.message;
                 }
 
@@ -131,8 +146,8 @@
                 errorBanner.classList.remove('hidden');
             }
         } catch (error) {
-            console.error('Login error:', error);
-            errorBanner.textContent = 'Connection error. Please try again later.';
+            console.error('Login Error:', error);
+            errorBanner.textContent = 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin.';
             errorBanner.classList.remove('hidden');
         } finally {
             submitBtn.disabled = false;

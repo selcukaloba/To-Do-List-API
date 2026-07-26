@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" class="h-full bg-zinc-50">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo API — Friends & Sharing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-grid {
+            background-size: 24px 24px;
+            background-image:
+                linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="min-h-full bg-zinc-50 text-zinc-900 font-sans antialiased bg-grid flex flex-col justify-between selection:bg-zinc-900 selection:text-white">
+
+<!-- Top Navigation Header -->
+<header class="w-full max-w-6xl mx-auto px-6 py-6 border-b border-zinc-200/60 flex justify-between items-center bg-zinc-50/80 backdrop-blur-sm sticky top-0 z-10">
+    <div class="flex items-center gap-3">
+        <div class="w-6 h-6 bg-zinc-900 rounded-md flex items-center justify-center">
+            <div class="w-2.5 h-2.5 bg-white"></div>
+        </div>
+        <span class="font-semibold tracking-tight text-base text-zinc-900">todo.api</span>
+        <span class="text-xs bg-zinc-200/60 text-zinc-700 px-2 py-0.5 rounded-full font-medium ml-2">Network</span>
+    </div>
+
+    <div class="flex items-center gap-4">
+        <a href="/dashboard" class="text-xs text-zinc-500 hover:text-zinc-900 font-medium transition-colors">
+            ← Back to Dashboard
+        </a>
+        <button id="logoutBtn" class="text-xs bg-zinc-900 hover:bg-zinc-800 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm">
+            Sign Out
+        </button>
+    </div>
+</header>
+
+<!-- Main Content Grid -->
+<main class="w-full max-w-6xl mx-auto px-6 py-8 flex-1">
+
+    <div class="mb-8 pb-6 border-b border-zinc-200/60">
+        <h1 class="text-2xl font-bold tracking-tight text-zinc-900">Friends & Collaboration</h1>
+        <p class="text-xs text-zinc-500 mt-1">Connect with teammates and track shared workspace tasks</p>
+    </div>
+
+    <!-- Status Banner -->
+    <div id="statusBanner" class="hidden mb-6 p-4 rounded-xl text-xs font-medium border"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Sol Kolon: Arkadaş Yönetimi (1 Kolon) -->
+        <div class="space-y-6">
+
+            <!-- Arkadaş İsteği Gönderme Kartı -->
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+                <h3 class="text-sm font-semibold text-zinc-900 mb-1">Add Friend</h3>
+                <p class="text-xs text-zinc-500 mb-4">Send a friend request using their exact username.</p>
+
+                <form id="addFriendForm" class="space-y-3">
+                    <input type="text"
+                           id="friendUsername"
+                           required
+                           placeholder="username"
+                           class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" />
+                    <button type="submit"
+                            class="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium py-2 rounded-lg transition-all shadow-sm">
+                        Send Request
+                    </button>
+                </form>
+            </div>
+
+            <!-- Arkadaş Listesi -->
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+                <h3 class="text-sm font-semibold text-zinc-900 mb-4">Your Friends</h3>
+                <div id="friendsList" class="space-y-2 text-xs text-zinc-500">
+                    <!-- Dynamic Friends List -->
+                    <p class="text-zinc-400 italic">Loading friends...</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sağ Kolon: Paylaşılan Görevler (2 Kolon) -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-900">Shared Tasks</h3>
+                        <p class="text-xs text-zinc-500 mt-0.5">Tasks assigned to or shared with you by teammates</p>
+                    </div>
+                </div>
+
+                <!-- Shared Todos Grid -->
+                <div id="sharedTodoGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Dynamic Shared Todos -->
+                </div>
+
+                <div id="noSharedTodos" class="hidden text-center py-12 border border-dashed border-zinc-200 rounded-xl">
+                    <p class="text-xs text-zinc-400">No shared tasks found in your workspace.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<footer class="w-full max-w-6xl mx-auto px-6 py-6 text-center border-t border-zinc-200/60 mt-12">
+    <p class="text-xs text-zinc-400">© 2026 Todo API Inc. Network Module</p>
+</footer>
+
+<script>
+    const token = localStorage.getItem('accessToken');
+
+    if (!token) {
+        window.location.href = '/login';
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('accessToken');
+        window.location.href = '/login';
+    });
+
+    // Arkadaş İsteği Gönderme
+    document.getElementById('addFriendForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('friendUsername').value.trim();
+        const statusBanner = document.getElementById('statusBanner');
+
+        try {
+            const response = await fetch(`/rest/api/friend/request/send/${username}`, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            const data = await response.json();
+
+            statusBanner.classList.remove('hidden');
+            if (response.ok) {
+                statusBanner.className = "mb-6 p-4 rounded-xl text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-700";
+                statusBanner.textContent = "Friend request sent successfully!";
+                document.getElementById('friendUsername').value = '';
+            } else {
+                statusBanner.className = "mb-6 p-4 rounded-xl text-xs font-medium bg-red-50 border border-red-200 text-red-600";
+                statusBanner.textContent = data.exceptionDetails?.message || data.message || "Failed to send request.";
+            }
+        } catch (err) {
+            console.error('Friend request error:', err);
+        }
+    });
+
+    // Arkadaşları Yükleme
+    async function loadFriends() {
+        const friendsList = document.getElementById('friendsList');
+        try {
+            const response = await fetch('/rest/api/friend/list', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            if (response.ok) {
+                const resData = await response.json();
+                const friends = resData.payload || resData;
+
+                friendsList.innerHTML = '';
+                if (!friends || friends.length === 0) {
+                    friendsList.innerHTML = '<p class="text-zinc-400 italic">No friends added yet.</p>';
+                    return;
+                }
+
+                friends.forEach(f => {
+                    const item = document.createElement('div');
+                    item.className = "flex justify-between items-center p-2.5 bg-zinc-50 border border-zinc-200/60 rounded-lg";
+                    item.innerHTML = `
+                        <span class="font-medium text-zinc-800">${f.username || f}</span>
+                        <span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Friend</span>
+                    `;
+                    friendsList.appendChild(item);
+                });
+            }
+        } catch (err) {
+            friendsList.innerHTML = '<p class="text-zinc-400 italic">Could not load friends.</p>';
+        }
+    }
+
+    // Paylaşılan Todoları Yükleme (shared_by_user_id detaylarıyla)
+    async function loadSharedTodos() {
+        const grid = document.getElementById('sharedTodoGrid');
+        const emptyState = document.getElementById('noSharedTodos');
+
+        try {
+            const response = await fetch('/rest/api/todo/getSharedTodos', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            if (response.ok) {
+                const resData = await response.json();
+                const todos = resData.payload || resData;
+
+                grid.innerHTML = '';
+                if (!todos || todos.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+                todos.forEach(todo => {
+                    const card = document.createElement('div');
+                    card.className = "bg-zinc-50 border border-zinc-200/80 rounded-xl p-4 flex flex-col justify-between";
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 bg-zinc-200/80 text-zinc-700 rounded">${todo.taskType || 'SHARED'}</span>
+                            </div>
+                            <h4 class="font-semibold text-xs text-zinc-900 mb-1">${todo.title}</h4>
+                            <p class="text-[11px] text-zinc-500 mb-3">${todo.description || 'No description'}</p>
+                        </div>
+                        <div class="pt-2 border-t border-zinc-200/60 text-[10px] text-zinc-400 flex justify-between items-center">
+                            <span>Shared by: <strong class="text-zinc-700">${todo.sharedByUsername || 'Teammate'}</strong></span>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        } catch (err) {
+            console.error('Shared todos error:', err);
+        }
+    }
+
+    // İlk Yüklemeler
+    loadFriends();
+    loadSharedTodos();
+</script>
+
+</body>
+</html>
