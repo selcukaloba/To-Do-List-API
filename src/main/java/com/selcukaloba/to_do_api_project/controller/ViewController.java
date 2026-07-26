@@ -22,4 +22,10 @@ public class ViewController {
 
     @GetMapping("/register")
     public String registerPage() {return "auth/register";}
+
+    @GetMapping("/dashboard")
+    public String dashboardPage() {return "todo/dashboard";}
+
+    @GetMapping("/friends")
+    public String friendsPage() {return "friend/friends";}
 }
