@@ -44,12 +44,18 @@
             <p class="text-xs text-zinc-500 mt-1">Manage, organize, and track your active tasks</p>
         </div>
 
-        <div class="flex gap-2">
+        <div class="flex gap-2 items-center">
+            <!-- Dinamik Gün Seçici -->
+            <div class="flex items-center gap-2 bg-white border border-zinc-200 px-3 py-1.5 rounded-lg shadow-sm">
+                <span class="text-xs text-zinc-500 font-medium">Days:</span>
+                <input type="number" id="upcomingsDays" value="7" min="1" max="365" class="w-12 text-xs font-semibold text-zinc-900 bg-zinc-50 border border-zinc-200 rounded p-1 text-center focus:outline-none focus:border-zinc-900" />
+            </div>
+
             <button id="toggleUpcomingsBtn" class="bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 font-medium text-xs px-4 py-2.5 rounded-lg transition-all shadow-sm active:scale-[0.98]">
-                <span>📅 Upcomings (7 Days)</span>
+                <span>📅 Upcomings</span>
             </button>
             <button onclick="openModal()" class="bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs px-4 py-2.5 rounded-lg transition-all shadow-sm active:scale-[0.98]">
-                <span>+ Create New Task</span>
+                <span>+ Create Task</span>
             </button>
         </div>
     </div>
@@ -165,7 +171,15 @@
         const grid = document.getElementById('todoGrid');
         const emptyState = document.getElementById('emptyState');
         const emptyTitle = document.getElementById('emptyStateTitle');
-        const endpoint = fetchUpcomings ? API_TODO_UPCOMINGS : API_TODO_ALL;
+
+        // Dinamik Endpoint Oluşturma
+        let endpoint = API_TODO_ALL;
+        let requestedDays = 7; // Default
+
+        if (fetchUpcomings) {
+            requestedDays = document.getElementById('upcomingsDays').value || 7;
+            endpoint = `/rest/api/todo/upcomings?days=${requestedDays}`; // Sabit const yerine dinamik yapı
+        }
 
         try {
             const response = await fetch(endpoint, {
@@ -178,7 +192,7 @@
                 grid.innerHTML = '';
 
                 if (currentTodos.length === 0) {
-                    emptyTitle.textContent = fetchUpcomings ? "No upcoming tasks in 7 days" : "No tasks found";
+                    emptyTitle.textContent = fetchUpcomings ? `No upcoming tasks in ${requestedDays} days` : "No tasks found";
                     emptyState.classList.remove('hidden');
                     return;
                 }
@@ -219,17 +233,28 @@
         }
     }
 
+    // --- TOGGLE UPCOMINGS ---
     document.getElementById('toggleUpcomingsBtn').addEventListener('click', (e) => {
         isShowingUpcomings = !isShowingUpcomings;
         const btn = e.currentTarget;
+        const daysInput = document.getElementById('upcomingsDays');
+
         if (isShowingUpcomings) {
             btn.classList.add('bg-zinc-900', 'text-white', 'border-zinc-900');
             btn.classList.remove('bg-white', 'text-zinc-700');
             btn.innerHTML = '<span>🔙 Show All Tasks</span>';
+
+            // Kullanıcı upcomings içindeyken input'u kilitleyelim ki mantık hatası olmasın
+            daysInput.disabled = true;
+            daysInput.classList.add('opacity-50');
         } else {
             btn.classList.remove('bg-zinc-900', 'text-white', 'border-zinc-900');
             btn.classList.add('bg-white', 'text-zinc-700');
-            btn.innerHTML = '<span>📅 Upcomings (7 Days)</span>';
+            btn.innerHTML = '<span>📅 Upcomings</span>';
+
+            // All Tasks'e dönünce kilidi açalım
+            daysInput.disabled = false;
+            daysInput.classList.remove('opacity-50');
         }
         loadTodos(isShowingUpcomings);
     });
