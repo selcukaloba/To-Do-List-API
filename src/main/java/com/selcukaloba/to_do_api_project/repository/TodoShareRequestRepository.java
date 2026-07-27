@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface TodoShareRequestRepository extends JpaRepository<TodoShareRequest, Long> {
     List<TodoShareRequest> findByReceiverUsernameAndStatus(String username, TodoShareStatus status);
+    void deleteAllByTodoId(Long id);
 }
