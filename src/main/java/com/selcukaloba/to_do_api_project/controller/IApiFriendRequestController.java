@@ -1,6 +1,7 @@
 package com.selcukaloba.to_do_api_project.controller;
 
 import com.selcukaloba.to_do_api_project.dto.ApiFriendRequestResponse;
+import com.selcukaloba.to_do_api_project.dto.ApiUserResponse;
 
 import java.security.Principal;
 import java.util.List;
@@ -10,4 +11,5 @@ public interface IApiFriendRequestController {
     List<ApiFriendRequestResponse> getPendingRequests(Principal principal);
     void acceptRequest(Long requestId);
     void deleteRequest(Long requestId);
+    List<ApiUserResponse> getAllFriends(Principal principal);
 }

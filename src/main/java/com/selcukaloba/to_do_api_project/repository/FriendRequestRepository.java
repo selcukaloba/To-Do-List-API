@@ -1,5 +1,6 @@
 package com.selcukaloba.to_do_api_project.repository;
 
+import com.selcukaloba.to_do_api_project.dto.ApiUserResponse;
 import com.selcukaloba.to_do_api_project.entity.FriendRequest;
 import com.selcukaloba.to_do_api_project.entity.User;
 import com.selcukaloba.to_do_api_project.enums.FriendRequestStatus;

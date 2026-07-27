@@ -1,6 +1,7 @@
 package com.selcukaloba.to_do_api_project.service;
 
 import com.selcukaloba.to_do_api_project.dto.ApiFriendRequestResponse;
+import com.selcukaloba.to_do_api_project.dto.ApiUserResponse;
 import com.selcukaloba.to_do_api_project.entity.FriendRequest;
 import com.selcukaloba.to_do_api_project.entity.User;
 import com.selcukaloba.to_do_api_project.enums.FriendRequestStatus;
@@ -9,10 +10,12 @@ import com.selcukaloba.to_do_api_project.exception.ErrorMessage;
 import com.selcukaloba.to_do_api_project.exception.MessageType;
 import com.selcukaloba.to_do_api_project.repository.FriendRequestRepository;
 import com.selcukaloba.to_do_api_project.repository.UserRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,5 +86,18 @@ public class FriendRequestServiceImpl implements IFriendRequestService{
     public void deleteRequest(Long requestId) {
         FriendRequest friendRequest = friendRequestRepository.findById(requestId).orElseThrow(()-> new BaseException(new ErrorMessage(requestId.toString(), MessageType.FRIEND_REQUEST_NOT_FOUND)));
         friendRequestRepository.delete(friendRequest);
+    }
+
+    @Override
+    public List<ApiUserResponse> getAllFriends(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(()->new BaseException(new ErrorMessage(username, MessageType.USERNAME_NOT_FOUND)));
+
+        return user.getFriends().stream()
+                .map(friend -> {
+                    ApiUserResponse dto = new ApiUserResponse();
+                    BeanUtils.copyProperties(friend, dto);
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }
