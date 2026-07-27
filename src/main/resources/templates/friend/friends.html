@@ -16,7 +16,6 @@
 </head>
 <body class="min-h-full bg-zinc-50 text-zinc-900 font-sans antialiased bg-grid flex flex-col justify-between selection:bg-zinc-900 selection:text-white">
 
-<!-- Top Navigation Header -->
 <header class="w-full max-w-6xl mx-auto px-6 py-6 border-b border-zinc-200/60 flex justify-between items-center bg-zinc-50/80 backdrop-blur-sm sticky top-0 z-10">
     <div class="flex items-center gap-3">
         <div class="w-6 h-6 bg-zinc-900 rounded-md flex items-center justify-center">
@@ -36,7 +35,6 @@
     </div>
 </header>
 
-<!-- Main Content Grid -->
 <main class="w-full max-w-6xl mx-auto px-6 py-8 flex-1">
 
     <div class="mb-8 pb-6 border-b border-zinc-200/60">
@@ -44,15 +42,12 @@
         <p class="text-xs text-zinc-500 mt-1">Manage your network and collaborate on shared tasks</p>
     </div>
 
-    <!-- Status Banner -->
     <div id="statusBanner" class="hidden mb-6 p-4 rounded-xl text-xs font-medium border"></div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <!-- ================= SOL KOLON: ARKADAŞLIK YÖNETİMİ ================= -->
         <div class="space-y-6">
 
-            <!-- 1. Add Friend -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <h3 class="text-sm font-semibold text-zinc-900 mb-1">Add Friend</h3>
                 <form id="addFriendForm" class="space-y-3 mt-4">
@@ -63,7 +58,6 @@
                 </form>
             </div>
 
-            <!-- 2. Pending Friend Requests -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-sm font-semibold text-zinc-900">Friend Requests</h3>
@@ -74,7 +68,6 @@
                 </div>
             </div>
 
-            <!-- 3. Friends List -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <h3 class="text-sm font-semibold text-zinc-900 mb-4">Your Network</h3>
                 <div id="friendsList" class="space-y-2 text-xs text-zinc-500">
@@ -84,10 +77,8 @@
 
         </div>
 
-        <!-- ================= SAĞ KOLON: GÖREV PAYLAŞIM YÖNETİMİ ================= -->
         <div class="lg:col-span-2 space-y-6">
 
-            <!-- 1. Görev Paylaşma Formu -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <h3 class="text-sm font-semibold text-zinc-900 mb-4">Share a Task</h3>
                 <form id="shareTaskForm" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
@@ -109,7 +100,6 @@
                 </form>
             </div>
 
-            <!-- 2. Bekleyen Paylaşım İstekleri -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-sm font-semibold text-zinc-900">Task Invitations</h3>
@@ -120,7 +110,6 @@
                 </div>
             </div>
 
-            <!-- 3. Kabul Edilen Paylaşılan Görevler -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <div class="flex justify-between items-center mb-6">
                     <div>
@@ -130,7 +119,6 @@
                 </div>
 
                 <div id="sharedTodoGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Dinamik İçerik -->
                 </div>
 
                 <div id="noSharedTodos" class="hidden text-center py-12 border border-dashed border-zinc-200 rounded-xl">
@@ -143,7 +131,6 @@
     </div>
 </main>
 
-<!-- BACKEND HABERLEŞME SCRIPT'İ -->
 <script>
     const token = localStorage.getItem('accessToken');
     if (!token) window.location.href = '/login';
@@ -165,23 +152,18 @@
         setTimeout(() => statusBanner.classList.add('hidden'), 5000);
     }
 
-    // ================= API ENDPOINT'LERİ =================
-    // Arkadaşlık Endpoint'leri
     const API_FRIEND_SEND = '/friends/request/send';
     const API_FRIEND_PENDING = '/friends/request/pending';
     const API_FRIEND_ACCEPT = '/friends/request/accept/';
     const API_FRIEND_REJECT = '/friends/request/delete/';
     const API_FRIEND_LIST = '/friends/list';
 
-    // Görev Paylaşım Endpoint'leri
-    const API_TODO_ALL = '/rest/api/todo/all'; // Dropdown'u doldurmak için
-    const API_SHARE_SEND = '/rest/api/todo/share/'; // + {id}?friendUsername=...
+    const API_TODO_ALL = '/rest/api/todo/all'; // Tüm görevleri çekmek için ana uç nokta
+    const API_SHARE_SEND = '/rest/api/todo/share/';
     const API_SHARE_PENDING = '/rest/api/todo/share/pending';
-    const API_SHARE_ACCEPT = '/rest/api/todo/share/accept/'; // + {requestId}
-    const API_SHARE_REJECT = '/rest/api/todo/share/reject/'; // + {requestId}
-    const API_SHARED_ALL = '/rest/api/todo/shared/all';
+    const API_SHARE_ACCEPT = '/rest/api/todo/share/accept/';
+    const API_SHARE_REJECT = '/rest/api/todo/share/reject/';
 
-    // ================= ARKADAŞLIK FONKSİYONLARI =================
     document.getElementById('addFriendForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = document.getElementById('friendUsername').value.trim();
@@ -248,9 +230,6 @@
         } catch (err) {}
     }
 
-    // ================= PAYLAŞIM FONKSİYONLARI =================
-
-    // 1. Arkadaşlar Listesini Yükle (Hem Sol Kolonu Hem Dropdown'u Doldurur)
     async function loadFriendsAndPopulateDropdown() {
         const list = document.getElementById('friendsList');
         const select = document.getElementById('friendSelect');
@@ -270,21 +249,17 @@
 
                 friends.forEach(f => {
                     const friendName = typeof f === 'object' ? (f.username || f.receiverUsername || f.senderUsername) : f;
-                    // Sol Kolona Ekle
                     list.innerHTML += `
                         <div class="flex justify-between items-center p-2.5 bg-zinc-50 border border-zinc-200/60 rounded-lg">
                             <span class="font-medium text-zinc-800">${friendName}</span>
                             <span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Friend</span>
                         </div>`;
-
-                    // Dropdown'a Ekle
                     select.innerHTML += `<option value="${friendName}">${friendName}</option>`;
                 });
             }
         } catch (err) {}
     }
 
-    // 2. Kendi Görevlerini Yükle (Dropdown'u Doldurur)
     async function loadMyTodosForDropdown() {
         const select = document.getElementById('todoSelect');
         try {
@@ -303,7 +278,6 @@
         } catch (err) {}
     }
 
-    // 3. Görev Paylaşma İsteği Gönder
     document.getElementById('shareTaskForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const todoId = document.getElementById('todoSelect').value;
@@ -330,7 +304,6 @@
         }
     });
 
-    // 4. Bekleyen Görev Paylaşım İstekleri
     async function loadPendingShareRequests() {
         try {
             const response = await fetch(API_SHARE_PENDING, { headers: { 'Authorization': 'Bearer ' + token } });
@@ -367,36 +340,43 @@
             if (response.ok) {
                 showStatus(`Task invitation ${action}ed!`);
                 loadPendingShareRequests();
-                loadSharedTodos();
+                loadSharedTodos(); // Kabul edildikten sonra listeyi güncelle
             }
         } catch (err) {}
     }
 
-    // 5. Paylaşılan (Kabul Edilen) Görevleri Listele
     async function loadSharedTodos() {
         const grid = document.getElementById('sharedTodoGrid');
         const emptyState = document.getElementById('noSharedTodos');
         try {
-            const response = await fetch(API_SHARED_ALL, { headers: { 'Authorization': 'Bearer ' + token } });
+            // Artık API_TODO_ALL kullanarak tüm listeyi çekip filtreliyoruz
+            const response = await fetch(API_TODO_ALL, { headers: { 'Authorization': 'Bearer ' + token } });
             if (response.ok) {
                 const data = await response.json();
-                const todos = Array.isArray(data) ? data : (data.payload || []);
+                let allTasks = Array.isArray(data) ? data : (data.payload || []);
+
+                // YENİ EKLENEN FİLTRE: Sadece başkasına ait olan (paylaşılan) görevleri tut
+                let sharedTasks = allTasks.filter(todo => todo.ownerUsername);
 
                 grid.innerHTML = '';
-                if (todos.length === 0) {
+                if (sharedTasks.length === 0) {
                     emptyState.classList.remove('hidden');
                     return;
                 }
 
                 emptyState.classList.add('hidden');
-                todos.forEach(todo => {
+                sharedTasks.forEach(todo => {
                     const isCompleted = todo.completed || todo.isCompleted;
                     grid.innerHTML += `
                         <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col justify-between ${isCompleted ? 'opacity-60' : ''}">
                             <div>
                                 <div class="flex justify-between items-start mb-2">
                                     <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-zinc-200/80 text-zinc-700 rounded">${todo.taskType}</span>
-                                    <span class="text-[10px] bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-md">Shared</span>
+
+                                    <!-- Statik "Shared" yazısı yerine dinamik isim rozeti -->
+                                    <span class="text-[10px] bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-md font-medium shadow-sm">
+                                        👤 from ${todo.ownerUsername}
+                                    </span>
                                 </div>
                                 <h4 class="font-semibold text-xs text-zinc-900 mb-1 ${isCompleted ? 'line-through' : ''}">${todo.title}</h4>
                                 <p class="text-[11px] text-zinc-500 mb-3">${todo.description || 'No description'}</p>
@@ -413,7 +393,6 @@
         }
     }
 
-    // ================= İLK YÜKLEMELER =================
     loadFriendRequests();
     loadFriendsAndPopulateDropdown();
     loadMyTodosForDropdown();
