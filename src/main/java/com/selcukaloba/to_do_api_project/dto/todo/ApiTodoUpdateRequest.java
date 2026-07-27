@@ -18,21 +18,21 @@ import java.time.LocalDateTime;
 @TaskDateMatch
 public class ApiTodoUpdateRequest {
 
-    @NotBlank(message = "title cannot be empty!")
-    @Size(min =3, max =100, message = "title must be in 3-100 characters!")
+    @NotBlank(message = "{todo.title.not_blank}")
+    @Size(min =3, max =100, message = "{todo.title.size}")
     private String title;
 
     private String description;
 
-    @NotNull(message = "task type should be given!")
+    @NotNull(message = "{todo.task_type.not_null}")
     private TaskType taskType;
 
-    @NotNull(message = "due time should be given!")
+    @NotNull(message = "{todo.due.date.not_null}")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dueDate;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @NotNull(message = "reminder date should be given!")
+    @NotNull(message = "{todo.reminder.date.not_null}")
     private LocalDateTime reminderDate;
 
     private boolean isCompleted;
