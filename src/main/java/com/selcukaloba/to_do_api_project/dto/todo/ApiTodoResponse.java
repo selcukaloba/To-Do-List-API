@@ -22,5 +22,6 @@ public class ApiTodoResponse {
     private LocalDateTime dueDate;
     private LocalDateTime reminderDate;
     private boolean isCompleted;
+    private String ownerUsername;
 }
 //frontende dönülmesi gereken tüm veriler

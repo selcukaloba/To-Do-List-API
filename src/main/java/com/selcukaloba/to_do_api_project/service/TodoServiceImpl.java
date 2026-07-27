@@ -60,6 +60,10 @@ public class TodoServiceImpl implements ITodoService{
         {
             ApiTodoResponse dto = new ApiTodoResponse();
             BeanUtils.copyProperties(todo, dto);
+            if(!todo.getUser().getUsername().equals(username))
+            {
+                dto.setOwnerUsername(todo.getUser().getUsername());
+            }
             responseList.add(dto);
         }
         return responseList;
@@ -76,7 +80,7 @@ public class TodoServiceImpl implements ITodoService{
         }
 
             BeanUtils.copyProperties(request, todo);
-            todo.setId(id);//id kopyalanırken bozulmasın
+            todo.setId(id);
             Todo updatedTodo = todoRepository.save(todo);
             ApiTodoResponse response = new ApiTodoResponse();
             BeanUtils.copyProperties(updatedTodo, response);

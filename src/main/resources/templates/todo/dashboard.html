@@ -200,33 +200,45 @@
                 emptyState.classList.add('hidden');
 
                 currentTodos.forEach(todo => {
-                    const isCompleted = todo.completed || todo.isCompleted;
-                    const cardClass = isCompleted
-                        ? "bg-zinc-50 border border-zinc-200 rounded-xl p-5 shadow-sm opacity-60"
-                        : "bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] hover:border-zinc-300 transition-all";
+        const isCompleted = todo.completed || todo.isCompleted;
+        const cardClass = isCompleted
+            ? "bg-zinc-50 border border-zinc-200 rounded-xl p-5 shadow-sm opacity-60"
+            : "bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] hover:border-zinc-300 transition-all";
 
-                    const card = document.createElement('div');
-                    card.className = cardClass + " flex flex-col justify-between";
+        const card = document.createElement('div');
+        card.className = cardClass + " flex flex-col justify-between";
 
-                    card.innerHTML = `
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-zinc-100 text-zinc-700 rounded-md">${todo.taskType}</span>
-                                <div class="flex gap-2">
-                                    <button onclick="openModal(${todo.id})" class="text-xs text-zinc-400 hover:text-zinc-900 transition-colors">Edit</button>
-                                    <button onclick="deleteTodo(${todo.id})" class="text-xs text-zinc-400 hover:text-red-600 transition-colors">Del</button>
-                                </div>
-                            </div>
-                            <h4 class="font-semibold text-sm text-zinc-900 mb-1 ${isCompleted ? 'line-through' : ''}">${todo.title}</h4>
-                            <p class="text-xs text-zinc-500 mb-4 line-clamp-2">${todo.description || 'No description provided.'}</p>
-                        </div>
-                        <div class="pt-3 border-t border-zinc-100 flex flex-col gap-1 text-[11px] text-zinc-400">
-                            <span>🎯 Due: <strong class="text-zinc-600">${todo.dueDate || 'N/A'}</strong></span>
-                            <span>⏰ Rem: ${todo.reminderDate || 'N/A'}</span>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
+        let sharedBadge = '';
+        if (todo.ownerUsername) {
+             sharedBadge = `<span class="text-[10px] ml-2 font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 shadow-sm">
+                                👤 from ${todo.ownerUsername}
+                            </span>`;
+        }
+
+        card.innerHTML = `
+            <div>
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex items-center">
+                        <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-zinc-100 text-zinc-700 rounded-md">
+                            ${todo.taskType}
+                        </span>
+                        ${sharedBadge}
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openModal(${todo.id})" class="text-xs text-zinc-400 hover:text-zinc-900 transition-colors">Edit</button>
+                        <button onclick="deleteTodo(${todo.id})" class="text-xs text-zinc-400 hover:text-red-600 transition-colors">Del</button>
+                    </div>
+                </div>
+                <h4 class="font-semibold text-sm text-zinc-900 mb-1 ${isCompleted ? 'line-through' : ''}">${todo.title}</h4>
+                <p class="text-xs text-zinc-500 mb-4 line-clamp-2">${todo.description || 'No description provided.'}</p>
+            </div>
+            <div class="pt-3 border-t border-zinc-100 flex flex-col gap-1 text-[11px] text-zinc-400">
+                <span>🎯 Due: <strong class="text-zinc-600">${todo.dueDate || 'N/A'}</strong></span>
+                <span>⏰ Rem: ${todo.reminderDate || 'N/A'}</span>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
             }
         } catch (err) {
             showStatus("Error loading tasks.", true);
