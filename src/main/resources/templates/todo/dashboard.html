@@ -307,7 +307,27 @@
                 loadTodos(isShowingUpcomings);
             } else {
                 const data = await response.json().catch(() => null);
-                showStatus(data?.exceptionDetails?.message || data?.message || "Error saving task.", true);
+                let errorMsg = "Error saving task.";
+
+                if (data) {
+                    // Backend'den gelen raw mesajı al
+                    let rawMessage = data.exceptionDetails?.message || data.message || data.error;
+
+                    if (typeof rawMessage === 'string') {
+                        errorMsg = rawMessage;
+                    } else if (typeof rawMessage === 'object' && rawMessage !== null) {
+                        // Eğer obje dönerse (Spring Validation Map gibi), içindeki tüm değerleri araya | koyarak birleştir
+                        errorMsg = Object.values(rawMessage).join(' | ');
+                    } else if (data.errors && Array.isArray(data.errors)) {
+                        // Default Spring Boot hata listesi için
+                        errorMsg = data.errors.map(err => err.defaultMessage || err).join(' | ');
+                    } else {
+                        // Hâlâ yakalayamadıysak JSON'ı direkt metne çevirerek bas (Object object'ten kurtarır)
+                        errorMsg = JSON.stringify(data);
+                    }
+                }
+
+                showStatus(errorMsg, true);
             }
         } catch (err) {
             showStatus("Network error occurred.", true);
