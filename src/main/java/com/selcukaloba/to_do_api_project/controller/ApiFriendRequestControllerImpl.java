@@ -1,6 +1,7 @@
 package com.selcukaloba.to_do_api_project.controller;
 
 import com.selcukaloba.to_do_api_project.dto.ApiFriendRequestResponse;
+import com.selcukaloba.to_do_api_project.dto.ApiUserResponse;
 import com.selcukaloba.to_do_api_project.service.IFriendRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +40,12 @@ public class ApiFriendRequestControllerImpl implements IApiFriendRequestControll
     @DeleteMapping(path = "/request/delete/{requestId}")
     public void deleteRequest(@PathVariable Long requestId) {
         friendRequestService.deleteRequest(requestId);
+    }
+
+    @GetMapping(path = "/list")
+    @Override
+    public List<ApiUserResponse> getAllFriends(Principal principal) {
+        String loginuser = principal.getName();
+        return friendRequestService.getAllFriends(loginuser);
     }
 }
