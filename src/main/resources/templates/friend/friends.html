@@ -23,7 +23,7 @@
             <div class="w-2.5 h-2.5 bg-white"></div>
         </div>
         <span class="font-semibold tracking-tight text-base text-zinc-900">todo.api</span>
-        <span class="text-xs bg-zinc-200/60 text-zinc-700 px-2 py-0.5 rounded-full font-medium ml-2">Network</span>
+        <span class="text-xs bg-zinc-200/60 text-zinc-700 px-2 py-0.5 rounded-full font-medium ml-2">Network & Sharing</span>
     </div>
 
     <div class="flex items-center gap-4">
@@ -40,8 +40,8 @@
 <main class="w-full max-w-6xl mx-auto px-6 py-8 flex-1">
 
     <div class="mb-8 pb-6 border-b border-zinc-200/60">
-        <h1 class="text-2xl font-bold tracking-tight text-zinc-900">Friends & Collaboration</h1>
-        <p class="text-xs text-zinc-500 mt-1">Connect with teammates and track shared workspace tasks</p>
+        <h1 class="text-2xl font-bold tracking-tight text-zinc-900">Collaboration Workspace</h1>
+        <p class="text-xs text-zinc-500 mt-1">Manage your network and collaborate on shared tasks</p>
     </div>
 
     <!-- Status Banner -->
@@ -49,7 +49,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <!-- Sol Kolon: Arkadaş Yönetimi -->
+        <!-- ================= SOL KOLON: ARKADAŞLIK YÖNETİMİ ================= -->
         <div class="space-y-6">
 
             <!-- 1. Add Friend -->
@@ -58,25 +58,25 @@
                 <form id="addFriendForm" class="space-y-3 mt-4">
                     <input type="text" id="friendUsername" required placeholder="username" class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" />
                     <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium py-2 rounded-lg transition-all shadow-sm">
-                        Send Request
+                        Send Friend Request
                     </button>
                 </form>
             </div>
 
-            <!-- 2. Pending Requests -->
+            <!-- 2. Pending Friend Requests -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-sm font-semibold text-zinc-900">Pending Requests</h3>
-                    <span id="pendingCount" class="text-[10px] bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded-full font-medium">0</span>
+                    <h3 class="text-sm font-semibold text-zinc-900">Friend Requests</h3>
+                    <span id="pendingFriendCount" class="text-[10px] bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded-full font-medium">0</span>
                 </div>
-                <div id="pendingList" class="space-y-3 text-xs text-zinc-500">
+                <div id="pendingFriendList" class="space-y-3 text-xs text-zinc-500">
                     <p class="text-zinc-400 italic">No pending requests.</p>
                 </div>
             </div>
 
             <!-- 3. Friends List -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
-                <h3 class="text-sm font-semibold text-zinc-900 mb-4">Your Friends</h3>
+                <h3 class="text-sm font-semibold text-zinc-900 mb-4">Your Network</h3>
                 <div id="friendsList" class="space-y-2 text-xs text-zinc-500">
                     <p class="text-zinc-400 italic">Loading friends...</p>
                 </div>
@@ -84,27 +84,64 @@
 
         </div>
 
-        <!-- Sağ Kolon: Paylaşılan Görevler -->
+        <!-- ================= SAĞ KOLON: GÖREV PAYLAŞIM YÖNETİMİ ================= -->
         <div class="lg:col-span-2 space-y-6">
+
+            <!-- 1. Görev Paylaşma Formu -->
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+                <h3 class="text-sm font-semibold text-zinc-900 mb-4">Share a Task</h3>
+                <form id="shareTaskForm" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                    <div class="sm:col-span-2">
+                        <select id="todoSelect" required class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+                            <option value="">Select a task...</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <select id="friendSelect" required class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+                            <option value="">Select a friend...</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-1">
+                        <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium py-2.5 rounded-lg transition-all shadow-sm">
+                            Share
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 2. Bekleyen Paylaşım İstekleri -->
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-semibold text-zinc-900">Task Invitations</h3>
+                    <span id="pendingShareCount" class="text-[10px] bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded-full font-medium">0</span>
+                </div>
+                <div id="pendingShareList" class="space-y-3 text-xs text-zinc-500">
+                    <p class="text-zinc-400 italic">No pending task invitations.</p>
+                </div>
+            </div>
+
+            <!-- 3. Kabul Edilen Paylaşılan Görevler -->
             <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h3 class="text-sm font-semibold text-zinc-900">Shared Tasks</h3>
-                        <p class="text-xs text-zinc-500 mt-0.5">Tasks assigned to or shared with you</p>
+                        <h3 class="text-sm font-semibold text-zinc-900">Shared Workspace</h3>
+                        <p class="text-xs text-zinc-500 mt-0.5">Tasks actively shared with you</p>
                     </div>
                 </div>
-                <div id="noSharedTodos" class="text-center py-12 border border-dashed border-zinc-200 rounded-xl">
-                    <p class="text-xs text-zinc-400">Todo Sharing module will be integrated in step 4.</p>
+
+                <div id="sharedTodoGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Dinamik İçerik -->
+                </div>
+
+                <div id="noSharedTodos" class="hidden text-center py-12 border border-dashed border-zinc-200 rounded-xl">
+                    <p class="text-xs text-zinc-400">No shared tasks found.</p>
                 </div>
             </div>
+
         </div>
 
     </div>
 </main>
-
-<footer class="w-full max-w-6xl mx-auto px-6 py-6 text-center border-t border-zinc-200/60 mt-12">
-    <p class="text-xs text-zinc-400">© 2026 Todo API Inc. Network Module</p>
-</footer>
 
 <!-- BACKEND HABERLEŞME SCRIPT'İ -->
 <script>
@@ -128,146 +165,260 @@
         setTimeout(() => statusBanner.classList.add('hidden'), 5000);
     }
 
-    // --- ENDPOINT'LER ---
+    // ================= API ENDPOINT'LERİ =================
+    // Arkadaşlık Endpoint'leri
     const API_FRIEND_SEND = '/friends/request/send';
     const API_FRIEND_PENDING = '/friends/request/pending';
     const API_FRIEND_ACCEPT = '/friends/request/accept/';
     const API_FRIEND_REJECT = '/friends/request/delete/';
     const API_FRIEND_LIST = '/friends/list';
 
-    // 1. İSTEK GÖNDERME
+    // Görev Paylaşım Endpoint'leri
+    const API_TODO_ALL = '/rest/api/todo/all'; // Dropdown'u doldurmak için
+    const API_SHARE_SEND = '/rest/api/todo/share/'; // + {id}?friendUsername=...
+    const API_SHARE_PENDING = '/rest/api/todo/share/pending';
+    const API_SHARE_ACCEPT = '/rest/api/todo/share/accept/'; // + {requestId}
+    const API_SHARE_REJECT = '/rest/api/todo/share/reject/'; // + {requestId}
+    const API_SHARED_ALL = '/rest/api/todo/shared/all';
+
+    // ================= ARKADAŞLIK FONKSİYONLARI =================
     document.getElementById('addFriendForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = document.getElementById('friendUsername').value.trim();
-
         const submitBtn = e.target.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
 
         try {
             const response = await fetch(`${API_FRIEND_SEND}?receiverUsername=${username}`, {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + token }
             });
-
             if (response.ok) {
-                showStatus("Friend request sent successfully!");
+                showStatus("Friend request sent!");
                 document.getElementById('friendUsername').value = '';
             } else {
                 const data = await response.json().catch(() => null);
-                showStatus(data?.exceptionDetails?.message || data?.message || "Failed to send request.", true);
+                showStatus(data?.exceptionDetails?.message || "Failed to send request.", true);
             }
         } catch (err) {
             showStatus("Network error occurred.", true);
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Send Request';
         }
     });
 
-    // 2. BEKLEYEN İSTEKLERİ GETİRME
-    async function loadPendingRequests() {
-        const pendingList = document.getElementById('pendingList');
-        const pendingCount = document.getElementById('pendingCount');
+    async function loadFriendRequests() {
         try {
-            const response = await fetch(API_FRIEND_PENDING, {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
+            const response = await fetch(API_FRIEND_PENDING, { headers: { 'Authorization': 'Bearer ' + token } });
             if (response.ok) {
                 const data = await response.json();
                 const requests = Array.isArray(data) ? data : (data.payload || []);
+                const list = document.getElementById('pendingFriendList');
+                document.getElementById('pendingFriendCount').textContent = requests.length;
 
-                pendingList.innerHTML = '';
-                pendingCount.textContent = requests.length || 0;
-
-                if (!requests || requests.length === 0) {
-                    pendingList.innerHTML = '<p class="text-zinc-400 italic">No pending requests.</p>';
+                list.innerHTML = '';
+                if (requests.length === 0) {
+                    list.innerHTML = '<p class="text-zinc-400 italic">No pending requests.</p>';
                     return;
                 }
-
                 requests.forEach(req => {
-                    const item = document.createElement('div');
-                    item.className = "flex justify-between items-center p-2.5 bg-white border border-zinc-200 rounded-lg shadow-sm";
-                    item.innerHTML = `
-                        <span class="font-medium text-zinc-800">${req.senderUsername}</span>
-                        <div class="flex gap-1.5">
-                            <button onclick="respondRequest(${req.id}, 'accept')" class="bg-zinc-900 hover:bg-zinc-800 text-white px-2.5 py-1 rounded-md text-[10px] font-medium transition-all">Accept</button>
-                            <button onclick="respondRequest(${req.id}, 'reject')" class="bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1 rounded-md text-[10px] font-medium transition-all">Reject</button>
-                        </div>
-                    `;
-                    pendingList.appendChild(item);
+                    list.innerHTML += `
+                        <div class="flex justify-between items-center p-2.5 bg-white border border-zinc-200 rounded-lg shadow-sm">
+                            <span class="font-medium text-zinc-800">${req.senderUsername}</span>
+                            <div class="flex gap-1.5">
+                                <button onclick="respondFriendRequest(${req.id}, 'accept')" class="bg-zinc-900 text-white px-2.5 py-1 rounded-md text-[10px] font-medium transition-all">Accept</button>
+                                <button onclick="respondFriendRequest(${req.id}, 'reject')" class="bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-[10px] font-medium transition-all">Reject</button>
+                            </div>
+                        </div>`;
                 });
             }
-        } catch (err) {
-            pendingList.innerHTML = '<p class="text-zinc-400 italic">Could not load requests.</p>';
-        }
+        } catch (err) {}
     }
 
-    // 3. İSTEĞİ KABUL ETME / REDDETME
-    window.respondRequest = async function(requestId, action) {
-        const url = action === 'accept' ? API_FRIEND_ACCEPT + requestId : API_FRIEND_REJECT + requestId;
+    window.respondFriendRequest = async function(id, action) {
+        const url = action === 'accept' ? API_FRIEND_ACCEPT + id : API_FRIEND_REJECT + id;
         const method = action === 'accept' ? 'POST' : 'DELETE';
-
         try {
-            const response = await fetch(url, {
-                method: method,
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
+            const response = await fetch(url, { method: method, headers: { 'Authorization': 'Bearer ' + token } });
             if (response.ok) {
-                showStatus(`Request ${action}ed successfully!`);
-                loadPendingRequests();
-                loadFriends();
-            } else {
-                const data = await response.json().catch(() => null);
-                showStatus(data?.message || `Failed to ${action} request.`, true);
+                showStatus(`Friend request ${action}ed!`);
+                loadFriendRequests();
+                loadFriendsAndPopulateDropdown();
             }
-        } catch (err) {
-            showStatus("Network error occurred.", true);
-        }
+        } catch (err) {}
     }
 
-    // 4. ARKADAŞLARI LİSTELEME
-    async function loadFriends() {
-        const friendsList = document.getElementById('friendsList');
+    // ================= PAYLAŞIM FONKSİYONLARI =================
+
+    // 1. Arkadaşlar Listesini Yükle (Hem Sol Kolonu Hem Dropdown'u Doldurur)
+    async function loadFriendsAndPopulateDropdown() {
+        const list = document.getElementById('friendsList');
+        const select = document.getElementById('friendSelect');
         try {
-            const response = await fetch(API_FRIEND_LIST, {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-
-            if (response.status === 404) {
-                friendsList.innerHTML = '<p class="text-zinc-400 italic">Endpoint not found (404). Add getAllFriends to backend.</p>';
-                return;
-            }
-
+            const response = await fetch(API_FRIEND_LIST, { headers: { 'Authorization': 'Bearer ' + token } });
             if (response.ok) {
                 const data = await response.json();
                 const friends = Array.isArray(data) ? data : (data.payload || []);
 
-                friendsList.innerHTML = '';
-                if (!friends || friends.length === 0) {
-                    friendsList.innerHTML = '<p class="text-zinc-400 italic">No friends added yet.</p>';
+                list.innerHTML = '';
+                select.innerHTML = '<option value="">Select a friend...</option>';
+
+                if (friends.length === 0) {
+                    list.innerHTML = '<p class="text-zinc-400 italic">No friends added yet.</p>';
                     return;
                 }
 
                 friends.forEach(f => {
                     const friendName = typeof f === 'object' ? (f.username || f.receiverUsername || f.senderUsername) : f;
-                    const item = document.createElement('div');
-                    item.className = "flex justify-between items-center p-2.5 bg-zinc-50 border border-zinc-200/60 rounded-lg";
-                    item.innerHTML = `
-                        <span class="font-medium text-zinc-800">${friendName}</span>
-                        <span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Friend</span>
+                    // Sol Kolona Ekle
+                    list.innerHTML += `
+                        <div class="flex justify-between items-center p-2.5 bg-zinc-50 border border-zinc-200/60 rounded-lg">
+                            <span class="font-medium text-zinc-800">${friendName}</span>
+                            <span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Friend</span>
+                        </div>`;
+
+                    // Dropdown'a Ekle
+                    select.innerHTML += `<option value="${friendName}">${friendName}</option>`;
+                });
+            }
+        } catch (err) {}
+    }
+
+    // 2. Kendi Görevlerini Yükle (Dropdown'u Doldurur)
+    async function loadMyTodosForDropdown() {
+        const select = document.getElementById('todoSelect');
+        try {
+            const response = await fetch(API_TODO_ALL, { headers: { 'Authorization': 'Bearer ' + token } });
+            if (response.ok) {
+                const data = await response.json();
+                const todos = Array.isArray(data) ? data : (data.payload || []);
+
+                select.innerHTML = '<option value="">Select a task...</option>';
+                todos.forEach(todo => {
+                    if(!todo.isCompleted && !todo.completed) {
+                        select.innerHTML += `<option value="${todo.id}">${todo.title}</option>`;
+                    }
+                });
+            }
+        } catch (err) {}
+    }
+
+    // 3. Görev Paylaşma İsteği Gönder
+    document.getElementById('shareTaskForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const todoId = document.getElementById('todoSelect').value;
+        const friendUsername = document.getElementById('friendSelect').value;
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch(`${API_SHARE_SEND}${todoId}?friendUsername=${friendUsername}`, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (response.ok) {
+                showStatus("Task share invitation sent!");
+                document.getElementById('shareTaskForm').reset();
+            } else {
+                const data = await response.json().catch(() => null);
+                showStatus(data?.exceptionDetails?.message || "Failed to share task.", true);
+            }
+        } catch (err) {
+            showStatus("Network error occurred.", true);
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+
+    // 4. Bekleyen Görev Paylaşım İstekleri
+    async function loadPendingShareRequests() {
+        try {
+            const response = await fetch(API_SHARE_PENDING, { headers: { 'Authorization': 'Bearer ' + token } });
+            if (response.ok) {
+                const data = await response.json();
+                const requests = Array.isArray(data) ? data : (data.payload || []);
+                const list = document.getElementById('pendingShareList');
+                document.getElementById('pendingShareCount').textContent = requests.length;
+
+                list.innerHTML = '';
+                if (requests.length === 0) {
+                    list.innerHTML = '<p class="text-zinc-400 italic">No pending task invitations.</p>';
+                    return;
+                }
+
+                requests.forEach(req => {
+                    list.innerHTML += `
+                        <div class="flex flex-col gap-2 p-3 bg-white border border-zinc-200 rounded-lg shadow-sm">
+                            <p class="text-xs text-zinc-600"><strong class="text-zinc-900">${req.senderUsername}</strong> wants to share <strong class="text-zinc-900">"${req.todoTitle}"</strong></p>
+                            <div class="flex gap-1.5 justify-end mt-1">
+                                <button onclick="respondShareRequest(${req.id}, 'accept')" class="bg-zinc-900 text-white px-3 py-1 rounded-md text-[10px] font-medium transition-all">Accept</button>
+                                <button onclick="respondShareRequest(${req.id}, 'reject')" class="bg-red-50 text-red-600 px-3 py-1 rounded-md text-[10px] font-medium transition-all">Reject</button>
+                            </div>
+                        </div>`;
+                });
+            }
+        } catch (err) {}
+    }
+
+    window.respondShareRequest = async function(id, action) {
+        const url = action === 'accept' ? API_SHARE_ACCEPT + id : API_SHARE_REJECT + id;
+        try {
+            const response = await fetch(url, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + token } });
+            if (response.ok) {
+                showStatus(`Task invitation ${action}ed!`);
+                loadPendingShareRequests();
+                loadSharedTodos();
+            }
+        } catch (err) {}
+    }
+
+    // 5. Paylaşılan (Kabul Edilen) Görevleri Listele
+    async function loadSharedTodos() {
+        const grid = document.getElementById('sharedTodoGrid');
+        const emptyState = document.getElementById('noSharedTodos');
+        try {
+            const response = await fetch(API_SHARED_ALL, { headers: { 'Authorization': 'Bearer ' + token } });
+            if (response.ok) {
+                const data = await response.json();
+                const todos = Array.isArray(data) ? data : (data.payload || []);
+
+                grid.innerHTML = '';
+                if (todos.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+                todos.forEach(todo => {
+                    const isCompleted = todo.completed || todo.isCompleted;
+                    grid.innerHTML += `
+                        <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex flex-col justify-between ${isCompleted ? 'opacity-60' : ''}">
+                            <div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-zinc-200/80 text-zinc-700 rounded">${todo.taskType}</span>
+                                    <span class="text-[10px] bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-md">Shared</span>
+                                </div>
+                                <h4 class="font-semibold text-xs text-zinc-900 mb-1 ${isCompleted ? 'line-through' : ''}">${todo.title}</h4>
+                                <p class="text-[11px] text-zinc-500 mb-3">${todo.description || 'No description'}</p>
+                            </div>
+                            <div class="pt-2 border-t border-zinc-200/60 text-[10px] text-zinc-400">
+                                <span>Due: <strong class="text-zinc-600">${todo.dueDate || 'N/A'}</strong></span>
+                            </div>
+                        </div>
                     `;
-                    friendsList.appendChild(item);
                 });
             }
         } catch (err) {
-            friendsList.innerHTML = '<p class="text-zinc-400 italic">Could not load friends.</p>';
+            emptyState.classList.remove('hidden');
         }
     }
 
-    // İlk Yüklemeler
-    loadPendingRequests();
-    loadFriends();
+    // ================= İLK YÜKLEMELER =================
+    loadFriendRequests();
+    loadFriendsAndPopulateDropdown();
+    loadMyTodosForDropdown();
+    loadPendingShareRequests();
+    loadSharedTodos();
 </script>
 
 </body>
