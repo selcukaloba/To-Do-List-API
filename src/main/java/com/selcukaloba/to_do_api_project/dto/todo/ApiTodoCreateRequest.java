@@ -16,23 +16,23 @@ import java.time.LocalDateTime;
 @TaskDateMatch
 public class ApiTodoCreateRequest {
 
-    @NotBlank(message = "title cannot be empty!")
-    @Size(min =3, max =100, message = "title must be in 3-100 characters!")
+    @NotBlank(message = "{todo.title.not_blank}")
+    @Size(min =3, max =100, message = "{todo.title.size}")
     private String title;
 
     private String description;
 
-    @NotNull(message = "task type should be given!")
+    @NotNull(message = "{todo.task_type.not_null}")
     private TaskType taskType;
 
-    @NotNull(message = "due time should be given!")
-    @FutureOrPresent(message = "invalid date!")
+    @NotNull(message = "{todo.due.date.not_null}")
+    @FutureOrPresent(message = "{todo.task.invalid_date}")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dueDate;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @NotNull(message = "reminder date should be given!")
-    @FutureOrPresent(message = "invalid date!")
+    @NotNull(message = "{todo.reminder.date.not_null}")
+    @FutureOrPresent(message = "{todo.task.invalid_date}")
     private LocalDateTime reminderDate;
 }
 //yeni eklenecek todonun idsi db'de yok, createdAt otomatik atanıyor

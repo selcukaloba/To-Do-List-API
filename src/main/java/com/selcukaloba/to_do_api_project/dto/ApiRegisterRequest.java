@@ -10,14 +10,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiRegisterRequest {
-    @NotBlank
+    @NotBlank(message ="{user.username.not_blank}")
     private String username;
-    @NotBlank
+    @NotBlank(message = "{user.email.not_blank}")
     @Pattern(
             regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$",
-            message = "Invalid email format!"
+            message = "{user.email.invalid}"
     )
     private String email;
-    @NotBlank
+    @NotBlank(message = "{user.password.not_blank}")
     private String password;
 }

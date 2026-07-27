@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+import org.springframework.web.servlet.i18n.FixedLocaleResolver;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -15,8 +16,7 @@ public class MessageConfig {
     @Bean
     public LocaleResolver localeResolver()
     {
-        AcceptHeaderLocaleResolver resolver = new AcceptHeaderLocaleResolver();
-        resolver.setSupportedLocales(Arrays.asList(Locale.ENGLISH, new Locale("tr")));
+        FixedLocaleResolver resolver = new FixedLocaleResolver();
         resolver.setDefaultLocale(Locale.ENGLISH);
         return resolver;
     }
