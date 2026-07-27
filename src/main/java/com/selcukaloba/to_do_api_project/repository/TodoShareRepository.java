@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TodoShareRepository extends JpaRepository<TodoShare, Long> {
     boolean existsByTodoAndSharedUser(Todo todo, User sharedUser);
     void deleteAllByTodoId(Long id);
+    boolean existsByTodoIdAndSharedUserId(Long todoId, Long sharedUserId);
+    void deleteByTodoIdAndSharedUserId(Long todoId, Long sharedUserId);
 }
