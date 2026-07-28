@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" class="h-full bg-zinc-50">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Todo API — Sign In</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -38,7 +38,8 @@
             <p class="text-xs text-zinc-500 mt-1">Please log in to access the system.</p>
         </div>
 
-        <div id="errorBanner" class="hidden mb-4 p-3 bg-red-50 border border-red-200/80 rounded-lg text-xs text-red-600 font-medium">
+        <div id="errorBanner"
+             class="hidden mb-4 p-3 bg-red-50 border border-red-200/80 rounded-lg text-xs text-red-600 font-medium">
         </div>
 
 
@@ -50,7 +51,7 @@
                        id="username"
                        required
                        placeholder="username"
-                       class="w-full px-3.5 py-2.5 bg-zinc-50/50 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-900 transition-all duration-150" />
+                       class="w-full px-3.5 py-2.5 bg-zinc-50/50 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-900 transition-all duration-150"/>
             </div>
 
 
@@ -62,7 +63,7 @@
                        id="password"
                        required
                        placeholder="••••••••"
-                       class="w-full px-3.5 py-2.5 bg-zinc-50/50 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-900 transition-all duration-150" />
+                       class="w-full px-3.5 py-2.5 bg-zinc-50/50 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-900 transition-all duration-150"/>
             </div>
 
 
@@ -135,7 +136,7 @@
             }
         } catch (error) {
             console.error('Login Error:', error);
-            errorBanner.textContent = 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin.';
+            errorBanner.textContent = 'Cannot accessed';
             errorBanner.classList.remove('hidden');
         } finally {
             submitBtn.disabled = false;
