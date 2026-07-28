@@ -46,7 +46,7 @@
                 <input type="text"
                        id="username"
                        required
-                       placeholder="johndoe"
+                       placeholder="username"
                        class="w-full px-3.5 py-2.5 bg-zinc-50/50 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-900 transition-all duration-150" />
             </div>
 
@@ -55,7 +55,7 @@
                 <input type="email"
                        id="email"
                        required
-                       placeholder="john@example.com"
+                       placeholder="username@mail.com"
                        class="w-full px-3.5 py-2.5 bg-zinc-50/50 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-900 transition-all duration-150" />
             </div>
 
@@ -89,7 +89,6 @@
         const statusBanner = document.getElementById('statusBanner');
         const submitBtn = document.getElementById('submitBtn');
 
-        // Reset Banner
         statusBanner.className = 'hidden mb-4 p-3 rounded-lg text-xs font-medium';
         statusBanner.textContent = '';
 
