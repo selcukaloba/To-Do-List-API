@@ -7,6 +7,9 @@ import com.selcukaloba.to_do_api_project.dto.auth.ApiAuthResponse;
 import com.selcukaloba.to_do_api_project.dto.auth.ApiRefreshTokenRequest;
 import com.selcukaloba.to_do_api_project.entity.RefreshToken;
 import com.selcukaloba.to_do_api_project.entity.User;
+import com.selcukaloba.to_do_api_project.exception.BaseException;
+import com.selcukaloba.to_do_api_project.exception.ErrorMessage;
+import com.selcukaloba.to_do_api_project.exception.MessageType;
 import com.selcukaloba.to_do_api_project.jwt.JwtService;
 import com.selcukaloba.to_do_api_project.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
@@ -39,6 +42,13 @@ public class AuthServiceImpl implements IAuthService{
     @Override
     public ApiUserResponse register(ApiRegisterRequest registerRequest)
     {
+        if (userRepository.existsByUsername(registerRequest.getUsername())) {
+            throw new BaseException(new ErrorMessage("Username: " + registerRequest.getUsername(), MessageType.USER_ALREADY_EXISTS));
+        }
+
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new BaseException(new ErrorMessage("Email: " + registerRequest.getEmail(), MessageType.USER_ALREADY_EXISTS));
+        }
         User user = new User();
         ApiUserResponse userResponse = new ApiUserResponse();
 
