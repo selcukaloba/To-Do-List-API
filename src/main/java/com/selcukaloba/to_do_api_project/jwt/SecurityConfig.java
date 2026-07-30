@@ -4,6 +4,7 @@ import com.selcukaloba.to_do_api_project.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,34 +23,49 @@ public class SecurityConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
+    @Order(1)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
+        http.securityMatcher("/api/**");
         http.csrf(csrf->csrf.disable());
 
-        http.authorizeHttpRequests(auth->auth
-                .requestMatchers(
-                        "/auth/**",
-                        "/login",
-                        "/register",
-                        "/dashboard",
-                        "/friends",
-                        "/css/**",
-                        "/js/**",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/swagger-ui.html",
-                        "/error"
-                ).permitAll()
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/v1/auth/**").permitAll() // API login/register serbest
+                .anyRequest().authenticated()
+        );
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.authenticationProvider(authenticationProvider);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
 
-                .anyRequest().authenticated());
+    @Bean
+    @Order(2)
+    public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable());
 
-        http.sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/login", "/register", "/css/**", "/js/**", "/error").permitAll()
+                .anyRequest().authenticated()
+        );
+
+        http.formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/dashboard", true)
+                .failureUrl("/login?error=true")
+                .permitAll()
+        );
+
+        http.logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+        );
 
         http.authenticationProvider(authenticationProvider);
-
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
-
     }
 }

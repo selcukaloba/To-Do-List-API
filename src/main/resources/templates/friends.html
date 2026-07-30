@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" class="h-full bg-zinc-50">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo API — Friends & Sharing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-grid {
+            background-size: 24px 24px;
+            background-image:
+                linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-full bg-zinc-50 text-zinc-900 font-sans antialiased bg-grid flex flex-col justify-between selection:bg-zinc-900 selection:text-white">
+
+<header class="w-full max-w-6xl mx-auto px-6 py-6 border-b border-zinc-200/60 flex justify-between items-center bg-zinc-50/80 backdrop-blur-sm sticky top-0 z-10">
+    <div class="flex items-center gap-3">
+        <div class="w-6 h-6 bg-zinc-900 rounded-md flex items-center justify-center">
+            <div class="w-2.5 h-2.5 bg-white"></div>
+        </div>
+        <span class="font-semibold tracking-tight text-base text-zinc-900">todo.api</span>
+        <span class="text-xs bg-zinc-200/60 text-zinc-700 px-2 py-0.5 rounded-full font-medium ml-2">Network & Sharing</span>
+    </div>
+
+    <div class="flex items-center gap-4">
+        <a th:href="@{/dashboard}" class="text-xs text-zinc-500 hover:text-zinc-900 font-medium transition-colors">
+            ← Back to Dashboard
+        </a>
+
+        <form th:action="@{/logout}" method="post" class="m-0 p-0">
+            <button type="submit" class="text-xs bg-zinc-900 hover:bg-zinc-800 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm">
+                Sign Out
+            </button>
+        </form>
+    </div>
+</header>
+
+<main class="w-full max-w-6xl mx-auto px-6 py-8 flex-1">
+
+    <div th:if="${errorMsg}" th:text="${errorMsg}" class="mb-6 p-4 rounded-xl text-xs font-medium bg-red-50 border border-red-200 text-red-600 shadow-sm"></div>
+    <div th:if="${successMsg}" th:text="${successMsg}" class="mb-6 p-4 rounded-xl text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-700 shadow-sm"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Sol Kolon - Arkadaşlık İşlemleri -->
+        <div class="space-y-6">
+
+            <!-- Add Friend -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+                <h3 class="text-sm font-semibold text-zinc-900 mb-1">Add Friend</h3>
+                <form th:action="@{/friends/request/send}" method="post" class="space-y-3 mt-4">
+                    <input type="text" name="receiverUsername" required placeholder="username" class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" />
+                    <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium py-2 rounded-lg transition-all shadow-sm">
+                        Send Friend Request
+                    </button>
+                </form>
+            </div>
+
+            <!-- Friend Requests -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-semibold text-zinc-900">Friend Requests</h3>
+                    <span class="text-[10px] bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded-full font-medium"
+                          th:text="${pendingRequests != null ? pendingRequests.size() : 0}">0</span>
+                </div>
+
+                <div th:if="${pendingRequests == null || pendingRequests.isEmpty()}" class="text-xs text-zinc-400 italic">No pending requests.</div>
+
+                <div th:if="${pendingRequests != null && !pendingRequests.isEmpty()}" class="space-y-3 text-xs">
+                    <div th:each="req : ${pendingRequests}" class="flex justify-between items-center p-2.5 bg-white border border-zinc-200 rounded-lg shadow-sm">
+                        <span class="font-medium text-zinc-800" th:text="${req.senderUsername}">username</span>
+                        <div class="flex gap-1.5">
+                            <form th:action="@{/friends/request/accept/{id}(id=${req.id})}" method="post" class="m-0">
+                                <button type="submit" class="bg-zinc-900 text-white px-2.5 py-1 rounded-md text-[10px] font-medium transition-all">Accept</button>
+                            </form>
+                            <form th:action="@{/friends/request/delete/{id}(id=${req.id})}" method="post" class="m-0">
+                                <button type="submit" class="bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-[10px] font-medium transition-all">Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Your Network -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+                <h3 class="text-sm font-semibold text-zinc-900 mb-4">Your Network</h3>
+
+                <div th:if="${friends == null || friends.isEmpty()}" class="text-xs text-zinc-400 italic">No friends added yet.</div>
+
+                <div th:if="${friends != null && !friends.isEmpty()}" class="space-y-2 text-xs">
+                    <div th:each="friend : ${friends}" class="flex justify-between items-center p-2.5 bg-zinc-50 border border-zinc-200/60 rounded-lg">
+                        <span class="font-medium text-zinc-800" th:text="${friend.username}">Username</span>
+                        <span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Friend</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sağ Kolon - Todo Paylaşım İşlemleri -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- Share a Task -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+                <h3 class="text-sm font-semibold text-zinc-900 mb-4">Share a Task</h3>
+                <form th:action="@{/friends/share}" method="post" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                    <div class="sm:col-span-2">
+                        <select name="todoId" required class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+                            <option value="">Select a task...</option>
+                            <option th:each="todo : ${myTodos}" th:value="${todo.id}" th:text="${todo.title}">Task</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <select name="friendUsername" required class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+                            <option value="">Select a friend...</option>
+                            <option th:each="friend : ${friends}" th:value="${friend.username}" th:text="${friend.username}">Friend</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-1">
+                        <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium py-2.5 rounded-lg transition-all shadow-sm">
+                            Share
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Pending Task Invitations -->
+            <div th:if="${pendingShareRequests != null && !pendingShareRequests.isEmpty()}" class="bg-amber-50 border border-amber-200 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="text-sm font-semibold text-amber-900">Pending Task Invitations</h3>
+                    </div>
+                    <span class="text-[10px] bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full font-medium"
+                          th:text="${pendingShareRequests.size()}">0</span>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <div th:each="req : ${pendingShareRequests}" class="flex justify-between items-center p-3 bg-white border border-amber-200 rounded-lg shadow-sm">
+                        <div>
+                            <p class="font-medium text-zinc-800">
+                                <span th:text="${req.todoTitle}">Task Title</span>
+                            </p>
+                            <p class="text-zinc-500 mt-0.5">
+                                Shared by <span class="font-medium text-zinc-700" th:text="${req.senderUsername}">username</span>
+                            </p>
+                        </div>
+                        <div class="flex gap-2">
+                            <form th:action="@{/friends/share/accept/{id}(id=${req.id})}" method="post" class="m-0">
+                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all shadow-sm">
+                                    Accept
+                                </button>
+                            </form>
+                            <form th:action="@{/friends/share/reject/{id}(id=${req.id})}" method="post" class="m-0">
+                                <button type="submit" class="bg-white border border-red-200 text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all">
+                                    Reject
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boş durum - Hiç pending istek yoksa -->
+            <div th:if="${pendingShareRequests == null || pendingShareRequests.isEmpty()}" class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+                <div class="text-center py-12 border border-dashed border-zinc-200 rounded-xl">
+                    <div class="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-zinc-400 text-lg">📨</span>
+                    </div>
+                    <h3 class="text-sm font-semibold text-zinc-900">No pending invitations</h3>
+                    <p class="text-xs text-zinc-500 mt-1">Task share requests from friends will appear here.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

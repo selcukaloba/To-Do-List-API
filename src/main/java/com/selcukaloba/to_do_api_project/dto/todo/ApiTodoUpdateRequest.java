@@ -36,5 +36,12 @@ public class ApiTodoUpdateRequest {
     private LocalDateTime reminderDate;
 
     private boolean isCompleted;
+    public Boolean getIsCompleted() {
+        return this.isCompleted;
+    }
+
+    public void setIsCompleted(Boolean isCompleted) {
+        this.isCompleted = isCompleted;
+    }
 }
 //create requestten farkı: update ederken isCompleted değiştirilebilir, onda direkt false olarak üretiliyor
