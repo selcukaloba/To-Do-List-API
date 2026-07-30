@@ -23,5 +23,12 @@ public class ApiTodoResponse {
     private LocalDateTime reminderDate;
     private boolean isCompleted;
     private String ownerUsername;
+    public Boolean getIsCompleted() {
+        return this.isCompleted;
+    }
+
+    public void setIsCompleted(Boolean isCompleted) {
+        this.isCompleted = isCompleted;
+    }
 }
 //frontende dönülmesi gereken tüm veriler

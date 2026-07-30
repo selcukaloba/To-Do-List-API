@@ -10,7 +10,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/friends")
+@RequestMapping("/api/v1/friends")
 public class ApiFriendRequestControllerImpl implements IApiFriendRequestController {
 
     @Autowired

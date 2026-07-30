@@ -27,6 +27,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService; //veritabanından kullanıcı sorgulama servisi
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return !path.startsWith("/api/");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String header = request.getHeader("Authorization");
         String token = null;
@@ -52,10 +58,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication); //spring securitynin context holderına eklenir
                 }
             }
-        }
-        catch(ExpiredJwtException e)
-        {
-            System.out.println("Token expired!" + e.getMessage());
         }
         catch(Exception e)
         {
