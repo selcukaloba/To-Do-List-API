@@ -47,10 +47,8 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <!-- Sol Kolon - Arkadaşlık İşlemleri -->
         <div class="space-y-6">
 
-            <!-- Add Friend -->
             <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <h3 class="text-sm font-semibold text-zinc-900 mb-1">Add Friend</h3>
                 <form th:action="@{/friends/request/send}" method="post" class="space-y-3 mt-4">
@@ -61,7 +59,6 @@
                 </form>
             </div>
 
-            <!-- Friend Requests -->
             <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-sm font-semibold text-zinc-900">Friend Requests</h3>
@@ -86,7 +83,6 @@
                 </div>
             </div>
 
-            <!-- Your Network -->
             <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <h3 class="text-sm font-semibold text-zinc-900 mb-4">Your Network</h3>
 
@@ -102,10 +98,8 @@
 
         </div>
 
-        <!-- Sağ Kolon - Todo Paylaşım İşlemleri -->
         <div class="lg:col-span-2 space-y-6">
 
-            <!-- Share a Task -->
             <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <h3 class="text-sm font-semibold text-zinc-900 mb-4">Share a Task</h3>
                 <form th:action="@{/friends/share}" method="post" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
@@ -168,7 +162,6 @@
                 </div>
             </div>
 
-            <!-- Boş durum - Hiç pending istek yoksa -->
             <div th:if="${pendingShareRequests == null || pendingShareRequests.isEmpty()}" class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <div class="text-center py-12 border border-dashed border-zinc-200 rounded-xl">
                     <div class="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-3">
