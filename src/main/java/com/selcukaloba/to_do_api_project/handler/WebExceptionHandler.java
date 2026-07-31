@@ -43,14 +43,15 @@ public class WebExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public RedirectView handleValidationException(MethodArgumentNotValidException ex,
-                                                  HttpServletRequest request, Locale locale) {
+    public RedirectView handleValidationException(MethodArgumentNotValidException ex,HttpServletRequest request, Locale locale) {
         FieldError fieldError = ex.getBindingResult().getFieldErrors().stream().findFirst().orElse(null);
         String localizedMessage;
-        if (fieldError != null) {
+        if (fieldError != null)
+        {
             String code = fieldError.getDefaultMessage().replaceAll("[{}]", "");
             localizedMessage = messageSource.getMessage(code, null, code, locale);
-        } else {
+        } else
+        {
             localizedMessage = messageSource.getMessage("validation.error", null, locale);
         }
 
