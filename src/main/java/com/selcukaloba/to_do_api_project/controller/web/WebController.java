@@ -13,6 +13,7 @@ import com.selcukaloba.to_do_api_project.service.IFriendRequestService;
 import com.selcukaloba.to_do_api_project.service.ITodoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 public class WebController {
@@ -35,6 +37,9 @@ public class WebController {
     @Autowired
     private IFriendRequestService friendRequestService;
 
+    @Autowired
+    private MessageSource messageSource;
+
     @GetMapping("/login")
     public String showLoginPage() {
         return "login";
@@ -46,17 +51,17 @@ public class WebController {
     }
 
     @PostMapping("/register")
-    public String processRegistration(@ModelAttribute ApiRegisterRequest registerRequest, Model model) {
-        try {
-            authService.register(registerRequest);
-            return "redirect:/login?registered=true";
-        } catch (BaseException ex) {
-            model.addAttribute("errorMsg", ex.getMessage());
-            return "register";
-        } catch (Exception ex) {
-            model.addAttribute("errorMsg", "Registration failed. Please check your details.");
-            return "register";
+    public String processRegistration(@Valid @ModelAttribute ApiRegisterRequest registerRequest,BindingResult bindingResult,RedirectAttributes redirectAttributes,Locale locale) {
+        if (bindingResult.hasErrors())
+        {
+            String errorCode = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            String validationError = messageSource.getMessage(errorCode, null, errorCode, locale);
+            redirectAttributes.addFlashAttribute("errorMsg", validationError);
+            return "redirect:/register";
         }
+
+        authService.register(registerRequest);
+        return "redirect:/login?registered=true";
     }
 
     @GetMapping("/dashboard")
@@ -138,8 +143,7 @@ public class WebController {
     }
 
     @PostMapping("/friends/request/send")
-    public String sendFriendRequest(@RequestParam String receiverUsername, Principal principal,
-                                    RedirectAttributes redirectAttributes) {
+    public String sendFriendRequest(@RequestParam String receiverUsername, Principal principal,RedirectAttributes redirectAttributes) {
         friendRequestService.sendFriendRequest(principal.getName(), receiverUsername);
         redirectAttributes.addFlashAttribute("successMsg", "Friend request sent!");
         return "redirect:/friends";
@@ -160,24 +164,21 @@ public class WebController {
     }
 
     @PostMapping("/friends/share")
-    public String shareTodo(@RequestParam Long todoId, @RequestParam String friendUsername,
-                            Principal principal, RedirectAttributes redirectAttributes) {
+    public String shareTodo(@RequestParam Long todoId, @RequestParam String friendUsername,Principal principal, RedirectAttributes redirectAttributes) {
         todoService.shareTodoWithFriend(todoId, principal.getName(), friendUsername);
         redirectAttributes.addFlashAttribute("successMsg", "Task invitation sent successfully!");
         return "redirect:/friends";
     }
 
     @PostMapping("/friends/share/accept/{id}")
-    public String acceptShareRequest(@PathVariable Long id, Principal principal,
-                                     RedirectAttributes redirectAttributes) {
+    public String acceptShareRequest(@PathVariable Long id, Principal principal,RedirectAttributes redirectAttributes) {
         todoService.acceptShareRequest(id, principal.getName());
         redirectAttributes.addFlashAttribute("successMsg", "Shared task accepted!");
         return "redirect:/friends";
     }
 
     @PostMapping("/friends/share/reject/{id}")
-    public String rejectShareRequest(@PathVariable Long id, Principal principal,
-                                     RedirectAttributes redirectAttributes) {
+    public String rejectShareRequest(@PathVariable Long id, Principal principal,RedirectAttributes redirectAttributes) {
         todoService.rejectShareRequest(id, principal.getName());
         redirectAttributes.addFlashAttribute("successMsg", "Shared task rejected!");
         return "redirect:/friends";
