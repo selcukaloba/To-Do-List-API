@@ -51,15 +51,7 @@ public class WebController {
     }
 
     @PostMapping("/register")
-    public String processRegistration(@Valid @ModelAttribute ApiRegisterRequest registerRequest,BindingResult bindingResult,RedirectAttributes redirectAttributes,Locale locale) {
-        if (bindingResult.hasErrors())
-        {
-            String errorCode = bindingResult.getAllErrors().get(0).getDefaultMessage();
-            String validationError = messageSource.getMessage(errorCode, null, errorCode, locale);
-            redirectAttributes.addFlashAttribute("errorMsg", validationError);
-            return "redirect:/register";
-        }
-
+    public String processRegistration(@Valid @ModelAttribute ApiRegisterRequest registerRequest) {
         authService.register(registerRequest);
         return "redirect:/login?registered=true";
     }
