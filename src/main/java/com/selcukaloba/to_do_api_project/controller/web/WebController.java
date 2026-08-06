@@ -74,10 +74,7 @@ public class WebController {
     }
 
     @PostMapping("/dashboard/todo/create")
-    public String createTodo(@Valid @ModelAttribute ApiTodoCreateRequest request,
-                             BindingResult bindingResult,
-                             Principal principal,
-                             RedirectAttributes redirectAttributes) {
+    public String createTodo(@Valid @ModelAttribute ApiTodoCreateRequest request,BindingResult bindingResult,Principal principal,RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             String validationError = bindingResult.getAllErrors().get(0).getDefaultMessage();
             redirectAttributes.addFlashAttribute("errorMsg", validationError);
@@ -90,11 +87,7 @@ public class WebController {
     }
 
     @PostMapping("/dashboard/todo/update/{id}")
-    public String updateTodo(@PathVariable Long id,
-                             @Valid @ModelAttribute ApiTodoUpdateRequest request,
-                             BindingResult bindingResult,
-                             Principal principal,
-                             RedirectAttributes redirectAttributes) {
+    public String updateTodo(@PathVariable Long id,@Valid @ModelAttribute ApiTodoUpdateRequest request,BindingResult bindingResult,Principal principal,RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             String validationError = bindingResult.getAllErrors().get(0).getDefaultMessage();
             redirectAttributes.addFlashAttribute("errorMsg", validationError);
