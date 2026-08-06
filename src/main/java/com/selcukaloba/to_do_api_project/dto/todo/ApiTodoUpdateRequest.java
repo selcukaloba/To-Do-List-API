@@ -35,6 +35,9 @@ public class ApiTodoUpdateRequest {
     @NotNull(message = "{todo.reminder.date.not_null}")
     private LocalDateTime reminderDate;
 
+    private Long teamId;
+    private String assignedToUsername;
+
     private boolean isCompleted;
     public Boolean getIsCompleted() {
         return this.isCompleted;
@@ -44,4 +47,3 @@ public class ApiTodoUpdateRequest {
         this.isCompleted = isCompleted;
     }
 }
-//create requestten farkı: update ederken isCompleted değiştirilebilir, onda direkt false olarak üretiliyor

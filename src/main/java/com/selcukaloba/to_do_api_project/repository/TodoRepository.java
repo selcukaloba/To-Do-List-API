@@ -23,4 +23,6 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
             @Param("username") String username
     );
     List<Todo> findByUserUsername(String username);
+    @Query("SELECT t FROM Todo t WHERE t.team.id = :teamId ORDER BY t.createdAt DESC")
+    List<Todo> findByTeamId(@Param("teamId") Long teamId);
 }
