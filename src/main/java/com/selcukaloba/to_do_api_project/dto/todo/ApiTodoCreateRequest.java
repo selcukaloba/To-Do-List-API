@@ -34,5 +34,7 @@ public class ApiTodoCreateRequest {
     @NotNull(message = "{todo.reminder.date.not_null}")
     @FutureOrPresent(message = "{todo.task.invalid_date}")
     private LocalDateTime reminderDate;
+
+    private Long teamId;
+    private String assignedToUsername;
 }
-//yeni eklenecek todonun idsi db'de yok, createdAt otomatik atanıyor

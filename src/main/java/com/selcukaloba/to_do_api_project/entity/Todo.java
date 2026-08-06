@@ -1,6 +1,7 @@
 package com.selcukaloba.to_do_api_project.entity;
 
 import com.selcukaloba.to_do_api_project.enums.TaskType;
+import com.selcukaloba.to_do_api_project.enums.TodoStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,5 +51,17 @@ public class Todo {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_to_id")
+    private User assignedTo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private TodoStatus status = TodoStatus.PENDING;
+
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
 
 }

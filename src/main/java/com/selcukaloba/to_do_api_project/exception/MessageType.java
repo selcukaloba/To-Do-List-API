@@ -29,6 +29,13 @@ public enum MessageType {
     FRIEND_REQUEST_NOT_FOUND("3008", "friends.request_not_found"),
     FRIEND_REQUEST_ALREADY_PENDING("3009", "friend.request_already_pending"),
 
+    //team errors
+    TEAM_NOT_FOUND("4001", "team.not_found"),
+    NOT_TEAM_LEADER("4002", "team.not_leader"),
+    ALREADY_TEAM_MEMBER("4003", "team.already_member"),
+    NOT_TEAM_MEMBER("4004", "team.not_member"),
+    TEAM_ALREADY_EXISTS("4005", "team.already_exists"),
+
     GENERAL_EXCEPTION("9999", "general.exception");
 
     private String code, message;

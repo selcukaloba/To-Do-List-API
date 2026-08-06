@@ -23,12 +23,15 @@ public class ApiTodoResponse {
     private LocalDateTime reminderDate;
     private boolean isCompleted;
     private String ownerUsername;
-    public Boolean getIsCompleted() {
-        return this.isCompleted;
-    }
+    private Long teamId;
+    private String teamName;
+    private String assignedToUsername;
 
     public void setIsCompleted(Boolean isCompleted) {
         this.isCompleted = isCompleted;
     }
+
+    public Boolean getIsCompleted() {
+        return this.isCompleted;
+    }
 }
-//frontende dönülmesi gereken tüm veriler

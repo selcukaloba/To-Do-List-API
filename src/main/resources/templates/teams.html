@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" class="h-full bg-zinc-50">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo API — Teams</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-grid {
+            background-size: 24px 24px;
+            background-image:
+                linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-full bg-zinc-50 text-zinc-900 font-sans antialiased bg-grid flex flex-col justify-between selection:bg-zinc-900 selection:text-white">
+
+<header class="w-full max-w-6xl mx-auto px-6 py-6 border-b border-zinc-200/60 flex justify-between items-center bg-zinc-50/80 backdrop-blur-sm sticky top-0 z-10">
+    <div class="flex items-center gap-3">
+        <div class="w-6 h-6 bg-zinc-900 rounded-md flex items-center justify-center">
+            <div class="w-2.5 h-2.5 bg-white"></div>
+        </div>
+        <span class="font-semibold tracking-tight text-base text-zinc-900">todo.api</span>
+        <span class="text-xs bg-zinc-200/60 text-zinc-700 px-2 py-0.5 rounded-full font-medium ml-2">Teams</span>
+    </div>
+
+    <div class="flex items-center gap-4">
+        <a th:href="@{/dashboard}" class="text-xs text-zinc-500 hover:text-zinc-900 font-medium transition-colors">
+            ← Back to Dashboard
+        </a>
+        <form th:action="@{/logout}" method="post" class="m-0 p-0">
+            <button type="submit" class="text-xs bg-zinc-900 hover:bg-zinc-800 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm">
+                Sign Out
+            </button>
+        </form>
+    </div>
+</header>
+
+<main class="w-full max-w-6xl mx-auto px-6 py-8 flex-1">
+
+    <div th:if="${errorMsg}" th:text="${errorMsg}" class="mb-6 p-4 rounded-xl text-xs font-medium bg-red-50 border border-red-200 text-red-600 shadow-sm"></div>
+    <div th:if="${successMsg}" th:text="${successMsg}" class="mb-6 p-4 rounded-xl text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-700 shadow-sm"></div>
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-6 border-b border-zinc-200/60">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-zinc-900">
+                <span th:text="|${username}'s Teams|">My Teams</span>
+            </h1>
+            <p class="text-xs text-zinc-500 mt-1">Create and manage your teams</p>
+        </div>
+
+        <button onclick="openCreateTeamModal()" class="bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs px-4 py-2.5 rounded-lg transition-all shadow-sm active:scale-[0.98]">
+            <span>+ Create Team</span>
+        </button>
+    </div>
+
+    <!-- Teams List -->
+    <div th:if="${teams != null && !teams.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div th:each="team : ${teams}" class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
+            <div class="flex justify-between items-start mb-3">
+                <h3 class="font-semibold text-sm text-zinc-900" th:text="${team.name}">Team Name</h3>
+                <span class="text-[10px] bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded-full">Leader: <span th:text="${team.leaderUsername}"></span></span>
+            </div>
+            <div class="text-xs text-zinc-500 mb-4">
+                <span th:text="${team.members.size()} + ' members'">0 members</span>
+            </div>
+            <div class="flex gap-2">
+                <button th:onclick="'openAddMemberModal(' + ${team.id} + ')'"
+                        class="text-xs bg-zinc-100 hover:bg-zinc-200 text-zinc-700 px-3 py-1.5 rounded-lg transition-all font-medium">
+                    + Add Member
+                </button>
+                <button th:onclick="'openAssignTodoModal(' + ${team.id} + ')'"
+                        class="text-xs bg-zinc-900 hover:bg-zinc-800 text-white px-3 py-1.5 rounded-lg transition-all font-medium">
+                    Assign Task
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${teams == null || teams.isEmpty()}" class="text-center py-16 border border-dashed border-zinc-300 rounded-2xl bg-white/50">
+        <div class="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <span class="text-zinc-400 text-lg">👥</span>
+        </div>
+        <h3 class="text-sm font-semibold text-zinc-900">No teams yet</h3>
+        <p class="text-xs text-zinc-500 mt-1">Create your first team to get started.</p>
+    </div>
+</main>
+
+<!-- Create Team Modal -->
+<div id="createTeamModal" class="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white border border-zinc-200 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-base font-semibold text-zinc-900">Create Team</h3>
+            <button onclick="closeCreateTeamModal()" type="button" class="text-zinc-400 hover:text-zinc-700 text-lg">&times;</button>
+        </div>
+        <form th:action="@{/teams/create}" method="post" class="space-y-4">
+            <div>
+                <label class="block text-xs font-medium text-zinc-700 mb-1">Team Name</label>
+                <input type="text" name="teamName" required placeholder="Team name..." class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:border-zinc-900" />
+            </div>
+            <div class="pt-3 flex justify-end gap-2 border-t border-zinc-100">
+                <button type="button" onclick="closeCreateTeamModal()" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-medium rounded-lg">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Member Modal -->
+<div id="addMemberModal" class="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white border border-zinc-200 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-base font-semibold text-zinc-900">Add Member</h3>
+            <button onclick="closeAddMemberModal()" type="button" class="text-zinc-400 hover:text-zinc-700 text-lg">&times;</button>
+        </div>
+        <form id="addMemberForm" method="post" class="space-y-4">
+            <div>
+                <label class="block text-xs font-medium text-zinc-700 mb-1">Username</label>
+                <input type="text" name="memberUsername" required placeholder="username" class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:border-zinc-900" />
+            </div>
+            <div class="pt-3 flex justify-end gap-2 border-t border-zinc-100">
+                <button type="button" onclick="closeAddMemberModal()" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-medium rounded-lg">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg">Add</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Assign Todo Modal -->
+<div id="assignTodoModal" class="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white border border-zinc-200 rounded-2xl max-w-md w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-base font-semibold text-zinc-900">Assign Task to Team</h3>
+            <button onclick="closeAssignTodoModal()" type="button" class="text-zinc-400 hover:text-zinc-700 text-lg">&times;</button>
+        </div>
+        <form id="assignTodoForm" method="post" class="space-y-4">
+            <div>
+                <label class="block text-xs font-medium text-zinc-700 mb-1">Title</label>
+                <input type="text" name="title" required minlength="3" maxlength="100" placeholder="Task title..." class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:border-zinc-900" />
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-zinc-700 mb-1">Description</label>
+                <textarea name="description" rows="2" placeholder="Task details..." class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:border-zinc-900"></textarea>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-zinc-700 mb-1">Task Type</label>
+                <select name="taskType" required class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:border-zinc-900">
+                    <option value="WORK">WORK</option>
+                    <option value="SCHOOL">SCHOOL</option>
+                    <option value="LIFESTYLE">LIFESTYLE</option>
+                    <option value="HEALTH">HEALTH</option>
+                    <option value="LEISURE">LEISURE</option>
+                    <option value="TRAVEL">TRAVEL</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-zinc-700 mb-1">Assign To (username)</label>
+                <input type="text" name="assignedToUsername" placeholder="username" class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:border-zinc-900" />
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-zinc-700 mb-1">Due Date</label>
+                <input type="datetime-local" name="dueDate" class="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" />
+            </div>
+            <div class="pt-3 flex justify-end gap-2 border-t border-zinc-100">
+                <button type="button" onclick="closeAssignTodoModal()" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-medium rounded-lg">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg">Assign</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openCreateTeamModal() {
+        document.getElementById('createTeamModal').classList.remove('hidden');
+    }
+    function closeCreateTeamModal() {
+        document.getElementById('createTeamModal').classList.add('hidden');
+    }
+
+    function openAddMemberModal(teamId) {
+        document.getElementById('addMemberForm').action = '/teams/' + teamId + '/add-member';
+        document.getElementById('addMemberModal').classList.remove('hidden');
+    }
+    function closeAddMemberModal() {
+        document.getElementById('addMemberModal').classList.add('hidden');
+    }
+
+    function openAssignTodoModal(teamId) {
+        document.getElementById('assignTodoForm').action = '/teams/' + teamId + '/assign-todo';
+        document.getElementById('assignTodoModal').classList.remove('hidden');
+    }
+    function closeAssignTodoModal() {
+        document.getElementById('assignTodoModal').classList.add('hidden');
+    }
+</script>
+
+</body>
+</html>

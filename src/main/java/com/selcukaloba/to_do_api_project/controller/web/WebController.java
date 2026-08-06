@@ -10,6 +10,7 @@ import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoUpdateRequest;
 import com.selcukaloba.to_do_api_project.exception.BaseException;
 import com.selcukaloba.to_do_api_project.service.IAuthService;
 import com.selcukaloba.to_do_api_project.service.IFriendRequestService;
+import com.selcukaloba.to_do_api_project.service.ITeamService;
 import com.selcukaloba.to_do_api_project.service.ITodoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ public class WebController {
 
     @Autowired
     private MessageSource messageSource;
+
+    @Autowired
+    private ITeamService teamService;
 
     @GetMapping("/login")
     public String showLoginPage() {
@@ -74,7 +78,7 @@ public class WebController {
     }
 
     @PostMapping("/dashboard/todo/create")
-    public String createTodo(@Valid @ModelAttribute ApiTodoCreateRequest request,BindingResult bindingResult,Principal principal,RedirectAttributes redirectAttributes) {
+    public String createTodo(@Valid @ModelAttribute ApiTodoCreateRequest request, BindingResult bindingResult, Principal principal, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             String validationError = bindingResult.getAllErrors().get(0).getDefaultMessage();
             redirectAttributes.addFlashAttribute("errorMsg", validationError);
@@ -87,7 +91,7 @@ public class WebController {
     }
 
     @PostMapping("/dashboard/todo/update/{id}")
-    public String updateTodo(@PathVariable Long id,@Valid @ModelAttribute ApiTodoUpdateRequest request,BindingResult bindingResult,Principal principal,RedirectAttributes redirectAttributes) {
+    public String updateTodo(@PathVariable Long id, @Valid @ModelAttribute ApiTodoUpdateRequest request, BindingResult bindingResult, Principal principal, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             String validationError = bindingResult.getAllErrors().get(0).getDefaultMessage();
             redirectAttributes.addFlashAttribute("errorMsg", validationError);
@@ -128,7 +132,7 @@ public class WebController {
     }
 
     @PostMapping("/friends/request/send")
-    public String sendFriendRequest(@RequestParam String receiverUsername, Principal principal,RedirectAttributes redirectAttributes) {
+    public String sendFriendRequest(@RequestParam String receiverUsername, Principal principal, RedirectAttributes redirectAttributes) {
         friendRequestService.sendFriendRequest(principal.getName(), receiverUsername);
         redirectAttributes.addFlashAttribute("successMsg", "Friend request sent!");
         return "redirect:/friends";
@@ -149,32 +153,80 @@ public class WebController {
     }
 
     @PostMapping("/friends/share")
-    public String shareTodo(@RequestParam Long todoId, @RequestParam String friendUsername,Principal principal, RedirectAttributes redirectAttributes) {
+    public String shareTodo(@RequestParam Long todoId, @RequestParam String friendUsername, Principal principal, RedirectAttributes redirectAttributes) {
         todoService.shareTodoWithFriend(todoId, principal.getName(), friendUsername);
         redirectAttributes.addFlashAttribute("successMsg", "Task invitation sent successfully!");
         return "redirect:/friends";
     }
 
     @PostMapping("/friends/share/accept/{id}")
-    public String acceptShareRequest(@PathVariable Long id, Principal principal,RedirectAttributes redirectAttributes) {
+    public String acceptShareRequest(@PathVariable Long id, Principal principal, RedirectAttributes redirectAttributes) {
         todoService.acceptShareRequest(id, principal.getName());
         redirectAttributes.addFlashAttribute("successMsg", "Shared task accepted!");
         return "redirect:/friends";
     }
 
     @PostMapping("/friends/share/reject/{id}")
-    public String rejectShareRequest(@PathVariable Long id, Principal principal,RedirectAttributes redirectAttributes) {
+    public String rejectShareRequest(@PathVariable Long id, Principal principal, RedirectAttributes redirectAttributes) {
         todoService.rejectShareRequest(id, principal.getName());
         redirectAttributes.addFlashAttribute("successMsg", "Shared task rejected!");
         return "redirect:/friends";
     }
 
     @PostMapping("/friends/unfriend/{friendUsername}")
-    public String unfriend(@PathVariable String friendUsername,  @RequestParam(defaultValue = "false") boolean keepShared, Principal principal, RedirectAttributes redirectAttributes)
-    {
+    public String unfriend(@PathVariable String friendUsername, @RequestParam(defaultValue = "false") boolean keepShared, Principal principal, RedirectAttributes redirectAttributes) {
         friendRequestService.unfriend(principal.getName(), friendUsername, keepShared);
         redirectAttributes.addFlashAttribute("successMsg", "Unfriend successfuly!");
         return "redirect:/friends";
     }
 
+    @GetMapping("/teams")
+    public String showTeamsPage(Model model, Principal principal) {
+        String username = principal.getName();
+        model.addAttribute("teams", teamService.getTeams(username));
+        model.addAttribute("username", username);
+        return "teams";
+    }
+
+    @PostMapping("/teams/create")
+    public String createTeam(@RequestParam String teamName, Principal principal, RedirectAttributes redirectAttributes) {
+        teamService.createTeam(teamName, principal.getName());
+        redirectAttributes.addFlashAttribute("successMsg", "Team created successfully!");
+        return "redirect:/teams";
+    }
+
+    @PostMapping("/teams/{teamId}/add-member")
+    public String addMember(@PathVariable long teamId, @RequestParam String memberUsername, Principal principal, RedirectAttributes redirectAttributes) {
+        teamService.addMember(teamId, memberUsername, principal.getName());
+        redirectAttributes.addFlashAttribute("successMsg", "Member added successfuly!");
+        return "redirect:/teams";
+    }
+
+    @PostMapping("teams/{teamId}/remove-member/{memberUsername}")
+    public String removeMember(@PathVariable long teamId, @PathVariable String memberUsername, Principal principal, RedirectAttributes redirectAttributes) {
+        teamService.removeMember(teamId, memberUsername, principal.getName());
+        redirectAttributes.addFlashAttribute("successMsg", "Removed successfully!");
+        return "redirect:/teams";
+    }
+
+    @PostMapping("teams/{teamId}/assign-todo")
+    public String assignTodoToTeam(@PathVariable long teamId, @Valid @ModelAttribute ApiTodoCreateRequest request, BindingResult bindingResult, Principal principal, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMsg", bindingResult.getAllErrors().get(0).getDefaultMessage());
+            return "redirect:/teams";
+        }
+        request.setTeamId(teamId);
+        teamService.assignTodoToTeam(request, principal.getName());
+        redirectAttributes.addFlashAttribute("successMsg", "Assigned successfully!");
+        return "redirect:/teams";
+    }
+
+    @PostMapping("teams/todo/delete/{todoId}")
+    public String deleteTeamTodo(@PathVariable long todoId, Principal principal, RedirectAttributes redirectAttributes)
+    {
+        teamService.deleteTeamTodo(todoId, principal.getName());
+        redirectAttributes.addFlashAttribute("successMsg", "Deleted successfully!");
+        return "redirect:/teams";
+    }
 }
+
