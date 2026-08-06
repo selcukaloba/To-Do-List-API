@@ -9,6 +9,7 @@ import com.selcukaloba.to_do_api_project.exception.BaseException;
 import com.selcukaloba.to_do_api_project.exception.ErrorMessage;
 import com.selcukaloba.to_do_api_project.exception.MessageType;
 import com.selcukaloba.to_do_api_project.repository.FriendRequestRepository;
+import com.selcukaloba.to_do_api_project.repository.TodoShareRepository;
 import com.selcukaloba.to_do_api_project.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class FriendRequestServiceImpl implements IFriendRequestService{
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TodoShareRepository todoShareRepository;
 
     @Override
     @Transactional
@@ -100,4 +104,26 @@ public class FriendRequestServiceImpl implements IFriendRequestService{
                 })
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional
+    public void unfriend(String currentUsername, String friendUsername, boolean keepShared)
+    {
+        User currentUser = userRepository.findByUsername(currentUsername).orElseThrow(()->new BaseException(new ErrorMessage(currentUsername, MessageType.USERNAME_NOT_FOUND)));
+        User friendUser = userRepository.findByUsername(friendUsername).orElseThrow(()->new BaseException(new ErrorMessage(friendUsername, MessageType.USERNAME_NOT_FOUND)));
+
+        currentUser.getFriends().remove(friendUser);
+        friendUser.getFriends().remove(currentUser);
+        userRepository.save(currentUser);
+        userRepository.save(friendUser);
+
+        List<FriendRequest> requests = friendRequestRepository.findAllBySenderAndReceiverOrReverse(currentUser, friendUser);
+        friendRequestRepository.deleteAll(requests);
+
+        if(!keepShared)
+        {
+            todoShareRepository.deleteAllByUsers(currentUser, friendUser);
+        }
+    }
+
 }

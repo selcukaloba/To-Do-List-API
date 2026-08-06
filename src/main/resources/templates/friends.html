@@ -49,6 +49,7 @@
 
         <div class="space-y-6">
 
+            <!-- Add Friend -->
             <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <h3 class="text-sm font-semibold text-zinc-900 mb-1">Add Friend</h3>
                 <form th:action="@{/friends/request/send}" method="post" class="space-y-3 mt-4">
@@ -59,6 +60,7 @@
                 </form>
             </div>
 
+            <!-- Friend Requests -->
             <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-sm font-semibold text-zinc-900">Friend Requests</h3>
@@ -83,6 +85,7 @@
                 </div>
             </div>
 
+            <!-- Your Network -->
             <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <h3 class="text-sm font-semibold text-zinc-900 mb-4">Your Network</h3>
 
@@ -91,7 +94,14 @@
                 <div th:if="${friends != null && !friends.isEmpty()}" class="space-y-2 text-xs">
                     <div th:each="friend : ${friends}" class="flex justify-between items-center p-2.5 bg-zinc-50 border border-zinc-200/60 rounded-lg">
                         <span class="font-medium text-zinc-800" th:text="${friend.username}">Username</span>
-                        <span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Friend</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Friend</span>
+                            <button th:data-username="${friend.username}"
+                                    onclick="openUnfriendModal(this.getAttribute('data-username'))"
+                                    class="text-[10px] text-red-400 hover:text-red-600 hover:bg-red-50 px-2 py-0.5 rounded transition-all font-medium">
+                                ✕
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -100,6 +110,7 @@
 
         <div class="lg:col-span-2 space-y-6">
 
+            <!-- Share a Task -->
             <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <h3 class="text-sm font-semibold text-zinc-900 mb-4">Share a Task</h3>
                 <form th:action="@{/friends/share}" method="post" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
@@ -123,6 +134,7 @@
                 </form>
             </div>
 
+            <!-- Pending Task Invitations -->
             <div th:if="${pendingShareRequests != null && !pendingShareRequests.isEmpty()}" class="bg-amber-50 border border-amber-200 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <div class="flex justify-between items-center mb-4">
                     <div class="flex items-center gap-2">
@@ -161,6 +173,7 @@
                 </div>
             </div>
 
+            <!-- No Pending Invitations -->
             <div th:if="${pendingShareRequests == null || pendingShareRequests.isEmpty()}" class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <div class="text-center py-12 border border-dashed border-zinc-200 rounded-xl">
                     <div class="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -175,6 +188,63 @@
 
     </div>
 </main>
+
+<!-- Unfriend Modal -->
+<div id="unfriendModal" class="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white border border-zinc-200 rounded-2xl max-w-sm w-full p-6 shadow-2xl transition-all">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-base font-semibold text-zinc-900">Unfriend</h3>
+            <button onclick="closeUnfriendModal()" type="button" class="text-zinc-400 hover:text-zinc-700 text-lg">&times;</button>
+        </div>
+
+        <p class="text-sm text-zinc-600 mb-2">
+            Are you sure you want to unfriend <strong id="unfriendUsername" class="text-zinc-900"></strong>?
+        </p>
+        <p class="text-xs text-zinc-500 mb-5">
+            What would you like to do with shared tasks from this friend?
+        </p>
+
+        <form id="unfriendForm" method="post" class="space-y-3">
+            <input type="hidden" name="keepShared" id="keepSharedInput" value="false" />
+
+            <button type="button" onclick="submitUnfriend(false)"
+                    class="w-full bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-medium py-2.5 rounded-lg transition-all">
+                🗑 Remove All Shared Tasks & Unfriend
+            </button>
+
+            <button type="button" onclick="submitUnfriend(true)"
+                    class="w-full bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs font-medium py-2.5 rounded-lg transition-all">
+                📥 Keep Shared Tasks & Unfriend
+            </button>
+
+            <button type="button" onclick="closeUnfriendModal()"
+                    class="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-medium py-2.5 rounded-lg transition-all">
+                Cancel
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let currentUnfriendUsername = '';
+
+    function openUnfriendModal(username) {
+        currentUnfriendUsername = username;
+        document.getElementById('unfriendUsername').textContent = username;
+        document.getElementById('unfriendModal').classList.remove('hidden');
+    }
+
+    function closeUnfriendModal() {
+        document.getElementById('unfriendModal').classList.add('hidden');
+    }
+
+    function submitUnfriend(keepShared) {
+        document.getElementById('keepSharedInput').value = keepShared;
+        const form = document.getElementById('unfriendForm');
+        form.action = '/friends/unfriend/' + currentUnfriendUsername;
+        form.submit();
+    }
+</script>
 
 </body>
 </html>
