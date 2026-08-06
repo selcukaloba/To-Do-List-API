@@ -169,4 +169,12 @@ public class WebController {
         return "redirect:/friends";
     }
 
+    @PostMapping("/friends/unfriend/{friendUsername}")
+    public String unfriend(@PathVariable String friendUsername,  @RequestParam(defaultValue = "false") boolean keepShared, Principal principal, RedirectAttributes redirectAttributes)
+    {
+        friendRequestService.unfriend(principal.getName(), friendUsername, keepShared);
+        redirectAttributes.addFlashAttribute("successMsg", "Unfriend successfuly!");
+        return "redirect:/friends";
+    }
+
 }

@@ -11,4 +11,5 @@ public interface IFriendRequestService {
     void acceptRequest(Long requestId);
     void deleteRequest(Long requestId);
     List<ApiUserResponse> getAllFriends(String username);
+    void unfriend(String currentUsername, String friendUsername, boolean keepShared);
 }
