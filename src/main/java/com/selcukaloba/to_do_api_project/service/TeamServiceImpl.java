@@ -99,7 +99,7 @@ public class TeamServiceImpl implements ITeamService{
 
     @Override
     public ApiTeamResponse getTeamDetail(Long teamId) {
-        Team team = teamRepository.findByIdWithMembers(teamId)
+        Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BaseException(new ErrorMessage("Team: " + teamId, MessageType.TEAM_NOT_FOUND)));
         return mapToTeamResponse(team);
     }
@@ -156,7 +156,7 @@ public class TeamServiceImpl implements ITeamService{
     @Override
     @Transactional
     public void assignExistingTodoToTeam(Long teamId, Long todoId, String assignedToUsername, String leaderUsername) {
-        Team team = teamRepository.findByIdWithMembers(teamId)
+        Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BaseException(new ErrorMessage("Team: " + teamId, MessageType.TEAM_NOT_FOUND)));
 
         if (!team.getLeader().getUsername().equals(leaderUsername)) {
@@ -165,6 +165,10 @@ public class TeamServiceImpl implements ITeamService{
 
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new BaseException(new ErrorMessage(String.valueOf(todoId), MessageType.TODO_NOT_FOUND)));
+
+        if (todo.getTeam() != null && todo.getTeam().getId().equals(teamId)) {
+            throw new BaseException(new ErrorMessage(todo.getTitle(), MessageType.TODO_ALREADY_IN_TEAM));
+        }
 
         todo.setTeam(team);
 
@@ -192,6 +196,7 @@ public class TeamServiceImpl implements ITeamService{
         ApiTeamResponse response = new ApiTeamResponse();
         BeanUtils.copyProperties(team, response);
         response.setLeaderUsername(team.getLeader().getUsername());
+        System.out.println("Team: " + team.getName() + ", Members count: " + team.getMembers().size());
         response.setMembers(team.getMembers().stream().map(tm -> {
             ApiUserResponse userDto = new ApiUserResponse();
             BeanUtils.copyProperties(tm.getUser(), userDto);
