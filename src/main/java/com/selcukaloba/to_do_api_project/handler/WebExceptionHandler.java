@@ -67,6 +67,9 @@ public class WebExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public RedirectView handleGeneralException(Exception ex, HttpServletRequest request, Locale locale) {
+        ex.printStackTrace();  // BU SATIRI EKLE - konsola hatayı yazdırır
+        System.out.println("=== GENERAL HANDLER: " + ex.getClass().getName() + " ===");
+        System.out.println("Message: " + ex.getMessage());
         String localizedMessage = messageSource.getMessage("general.exception", null, "An unexpected error occurred!", locale);
 
         FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
