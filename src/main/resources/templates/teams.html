@@ -67,7 +67,9 @@
             <div class="text-xs text-zinc-500 mb-4">
                 <span th:text="${team.members.size()} + ' members'">0 members</span>
             </div>
-            <div class="flex gap-2">
+
+            <!-- SADECE LEADER İSE BUTONLARI GÖSTER -->
+            <div th:if="${team.leaderUsername == username}" class="flex gap-2">
                 <button th:data-team-id="${team.id}" onclick="openAddMemberModal(this.getAttribute('data-team-id'))"
                         class="text-xs bg-zinc-100 hover:bg-zinc-200 text-zinc-700 px-3 py-1.5 rounded-lg transition-all font-medium">
                     + Add Member
@@ -76,6 +78,11 @@
                         class="text-xs bg-zinc-900 hover:bg-zinc-800 text-white px-3 py-1.5 rounded-lg transition-all font-medium">
                     Assign Task
                 </button>
+            </div>
+
+            <!-- LEADER DEĞİLSE SADECE MEMBER BADGE'I GÖSTER -->
+            <div th:unless="${team.leaderUsername == username}" class="flex gap-2">
+                <span class="text-[10px] text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 font-medium">Member</span>
             </div>
         </div>
     </div>
