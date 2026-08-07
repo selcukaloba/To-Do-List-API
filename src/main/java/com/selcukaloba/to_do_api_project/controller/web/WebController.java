@@ -184,6 +184,10 @@ public class WebController {
     public String showTeamsPage(Model model, Principal principal) {
         String username = principal.getName();
         model.addAttribute("teams", teamService.getTeams(username));
+        model.addAttribute("friends", friendRequestService.getAllFriends(username));
+        model.addAttribute("myTodos", todoService.getAllTodo(username).stream()
+                .filter(t -> t.getIsCompleted() == null || !t.getIsCompleted())
+                .toList());
         model.addAttribute("username", username);
         return "teams";
     }
@@ -218,6 +222,17 @@ public class WebController {
         request.setTeamId(teamId);
         teamService.assignTodoToTeam(request, principal.getName());
         redirectAttributes.addFlashAttribute("successMsg", "Assigned successfully!");
+        return "redirect:/teams";
+    }
+
+    @PostMapping("/teams/{teamId}/assign-existing-todo")
+    public String assignExistingTodoToTeam(@PathVariable Long teamId,
+                                           @RequestParam Long todoId,
+                                           @RequestParam(required = false) String assignedToUsername,
+                                           Principal principal,
+                                           RedirectAttributes redirectAttributes) {
+        teamService.assignExistingTodoToTeam(teamId, todoId, assignedToUsername, principal.getName());
+        redirectAttributes.addFlashAttribute("successMsg", "Task assigned to team!");
         return "redirect:/teams";
     }
 

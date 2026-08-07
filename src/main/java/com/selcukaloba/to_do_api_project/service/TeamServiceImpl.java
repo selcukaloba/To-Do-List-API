@@ -20,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,7 @@ public class TeamServiceImpl implements ITeamService{
         User leader = userRepository.findByUsername(leaderUsername).orElseThrow(()->new BaseException(new ErrorMessage(leaderUsername, MessageType.USERNAME_NOT_FOUND)));
         if(teamRepository.existsByNameAndLeaderUsername(name, leaderUsername))
         {
-            throw new BaseException(new ErrorMessage(name, MessageType.GENERAL_EXCEPTION));
+            throw new BaseException(new ErrorMessage(name, MessageType.TEAM_ALREADY_EXISTS));
         }
 
         Team team = new Team();
@@ -67,7 +68,7 @@ public class TeamServiceImpl implements ITeamService{
         }
         if(teamMemberRepository.existsByTeamAndUser(team, member))
         {
-            throw new BaseException(new ErrorMessage(leaderUsername, MessageType.NOT_TEAM_LEADER));
+            throw new BaseException(new ErrorMessage(leaderUsername, MessageType.ALREADY_TEAM_MEMBER));
         }
 
         TeamMember teamMember = new TeamMember();
@@ -90,12 +91,16 @@ public class TeamServiceImpl implements ITeamService{
 
     @Override
     public List<ApiTeamResponse> getTeams(String username) {
-        return teamRepository.findAllByUser(username).stream().map(this::mapToTeamResponse).collect(Collectors.toList());
+        return teamRepository.findAllByUser(username).stream()
+                .map(this::mapToTeamResponse)
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public ApiTeamResponse getTeamDetail(Long teamId) {
-        Team team = teamRepository.findById(teamId).orElseThrow(()->new BaseException(new ErrorMessage("Team: " + teamId, MessageType.TEAM_NOT_FOUND)));
+        Team team = teamRepository.findByIdWithMembers(teamId)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("Team: " + teamId, MessageType.TEAM_NOT_FOUND)));
         return mapToTeamResponse(team);
     }
 
@@ -139,13 +144,37 @@ public class TeamServiceImpl implements ITeamService{
         ApiTodoResponse response = new ApiTodoResponse();
         BeanUtils.copyProperties(todo, response);
         response.setOwnerUsername(leader.getUsername());
-        response.setTeamId(response.getTeamId());
-        response.setTeamName(response.getTeamName());
+        response.setTeamId(team.getId());
+        response.setTeamName(team.getName());
         if(todo.getAssignedTo()!=null)
         {
             response.setAssignedToUsername(todo.getAssignedTo().getUsername());
         }
         return response;
+    }
+
+    @Override
+    @Transactional
+    public void assignExistingTodoToTeam(Long teamId, Long todoId, String assignedToUsername, String leaderUsername) {
+        Team team = teamRepository.findByIdWithMembers(teamId)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("Team: " + teamId, MessageType.TEAM_NOT_FOUND)));
+
+        if (!team.getLeader().getUsername().equals(leaderUsername)) {
+            throw new BaseException(new ErrorMessage(leaderUsername, MessageType.NOT_TEAM_LEADER));
+        }
+
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new BaseException(new ErrorMessage(String.valueOf(todoId), MessageType.TODO_NOT_FOUND)));
+
+        todo.setTeam(team);
+
+        if (assignedToUsername != null && !assignedToUsername.isEmpty()) {
+            User assignedTo = userRepository.findByUsername(assignedToUsername)
+                    .orElseThrow(() -> new BaseException(new ErrorMessage(assignedToUsername, MessageType.USERNAME_NOT_FOUND)));
+            todo.setAssignedTo(assignedTo);
+        }
+
+        todoRepository.save(todo);
     }
 
     @Override
@@ -159,8 +188,7 @@ public class TeamServiceImpl implements ITeamService{
         todoRepository.delete(todo);
     }
 
-    private ApiTeamResponse mapToTeamResponse(Team team)
-    {
+    private ApiTeamResponse mapToTeamResponse(Team team) {
         ApiTeamResponse response = new ApiTeamResponse();
         BeanUtils.copyProperties(team, response);
         response.setLeaderUsername(team.getLeader().getUsername());
