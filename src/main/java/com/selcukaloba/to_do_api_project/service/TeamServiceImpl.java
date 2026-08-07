@@ -62,6 +62,11 @@ public class TeamServiceImpl implements ITeamService{
     public void addMember(Long teamId, String memberUsername, String leaderUsername) {
         Team team = teamRepository.findById(teamId).orElseThrow(()->new BaseException(new ErrorMessage("Team: " + teamId, MessageType.TEAM_NOT_FOUND)));
         User member = userRepository.findByUsername(memberUsername).orElseThrow(()->new BaseException(new ErrorMessage(memberUsername, MessageType.ALREADY_TEAM_MEMBER)));
+
+        if (!team.getLeader().getUsername().equals(leaderUsername)) {
+            throw new BaseException(new ErrorMessage(leaderUsername, MessageType.NOT_TEAM_LEADER));
+        }
+
         if(!team.getLeader().getUsername().equals(leaderUsername))
         {
             throw new BaseException(new ErrorMessage(leaderUsername, MessageType.NOT_TEAM_LEADER));
