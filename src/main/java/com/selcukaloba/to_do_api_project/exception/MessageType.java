@@ -35,6 +35,7 @@ public enum MessageType {
     ALREADY_TEAM_MEMBER("4003", "team.already_member"),
     NOT_TEAM_MEMBER("4004", "team.not_member"),
     TEAM_ALREADY_EXISTS("4005", "team.already_exists"),
+    TODO_ALREADY_IN_TEAM("4006", "todo.already.in.team"),
 
     GENERAL_EXCEPTION("9999", "general.exception");
 
