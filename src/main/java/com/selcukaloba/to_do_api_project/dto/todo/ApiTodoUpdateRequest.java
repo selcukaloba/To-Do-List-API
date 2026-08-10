@@ -2,6 +2,7 @@ package com.selcukaloba.to_do_api_project.dto.todo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.selcukaloba.to_do_api_project.enums.TaskType;
+import com.selcukaloba.to_do_api_project.enums.TodoStatus;
 import com.selcukaloba.to_do_api_project.validator.TaskDateMatch;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,6 +35,7 @@ public class ApiTodoUpdateRequest {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull(message = "{todo.reminder.date.not_null}")
     private LocalDateTime reminderDate;
+    private TodoStatus status;
 
     private Long teamId;
     private String assignedToUsername;

@@ -1,6 +1,7 @@
 package com.selcukaloba.to_do_api_project.dto.todo;
 
 import com.selcukaloba.to_do_api_project.enums.TaskType;
+import com.selcukaloba.to_do_api_project.enums.TodoStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class ApiTodoResponse {
     private Long teamId;
     private String teamName;
     private String assignedToUsername;
+    private TodoStatus status;
 
     public void setIsCompleted(Boolean isCompleted) {
         this.isCompleted = isCompleted;
