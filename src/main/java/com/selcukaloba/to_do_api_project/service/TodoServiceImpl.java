@@ -4,18 +4,12 @@ import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoCreateRequest;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoShareRequestResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoUpdateRequest;
-import com.selcukaloba.to_do_api_project.entity.Todo;
-import com.selcukaloba.to_do_api_project.entity.TodoShare;
-import com.selcukaloba.to_do_api_project.entity.TodoShareRequest;
-import com.selcukaloba.to_do_api_project.entity.User;
+import com.selcukaloba.to_do_api_project.entity.*;
 import com.selcukaloba.to_do_api_project.enums.TodoShareStatus;
 import com.selcukaloba.to_do_api_project.exception.BaseException;
 import com.selcukaloba.to_do_api_project.exception.ErrorMessage;
 import com.selcukaloba.to_do_api_project.exception.MessageType;
-import com.selcukaloba.to_do_api_project.repository.TodoRepository;
-import com.selcukaloba.to_do_api_project.repository.TodoShareRepository;
-import com.selcukaloba.to_do_api_project.repository.TodoShareRequestRepository;
-import com.selcukaloba.to_do_api_project.repository.UserRepository;
+import com.selcukaloba.to_do_api_project.repository.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +32,8 @@ public class TodoServiceImpl implements ITodoService{
     private TodoShareRequestRepository todoShareRequestRepository;
     @Autowired
     private TodoShareRepository todoShareRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Override
     public ApiTodoResponse createTodo(ApiTodoCreateRequest request, String username) {
@@ -56,14 +52,15 @@ public class TodoServiceImpl implements ITodoService{
     public List<ApiTodoResponse> getAllTodo(String username) {
         List<Todo> todoList = todoRepository.findAllTodosByOwnerOrSharedUser(username);
         List<ApiTodoResponse> responseList = new ArrayList<>();
-        for(Todo todo: todoList)
-        {
+        for(Todo todo: todoList) {
             ApiTodoResponse dto = new ApiTodoResponse();
             BeanUtils.copyProperties(todo, dto);
-            if(!todo.getUser().getUsername().equals(username))
-            {
+            if(!todo.getUser().getUsername().equals(username)) {
                 dto.setOwnerUsername(todo.getUser().getUsername());
             }
+            int commentCount = commentRepository.countByTodoId(todo.getId());
+            dto.setCommentCount(commentCount);
+
             responseList.add(dto);
         }
         return responseList;

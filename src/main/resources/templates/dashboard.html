@@ -150,7 +150,7 @@
                 </div>
                 <a th:href="@{/dashboard/todo/{id}/comments(id=${todo.id})}"
                    class="text-[10px] font-medium text-zinc-500 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-1 rounded-lg transition-all flex-shrink-0">
-                    💬 Comments
+                    💬 <span th:text="${todo.commentCount}">0</span>
                 </a>
             </div>
         </div>

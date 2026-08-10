@@ -28,11 +28,11 @@ public class ApiTodoResponse {
     private String teamName;
     private String assignedToUsername;
     private TodoStatus status;
+    private int commentCount;
 
     public void setIsCompleted(Boolean isCompleted) {
         this.isCompleted = isCompleted;
     }
-
     public Boolean getIsCompleted() {
         return this.isCompleted;
     }
