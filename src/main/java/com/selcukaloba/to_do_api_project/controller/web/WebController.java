@@ -1,5 +1,6 @@
 package com.selcukaloba.to_do_api_project.controller.web;
 
+import com.selcukaloba.to_do_api_project.dto.ApiCommentResponse;
 import com.selcukaloba.to_do_api_project.dto.ApiFriendRequestResponse;
 import com.selcukaloba.to_do_api_project.dto.ApiRegisterRequest;
 import com.selcukaloba.to_do_api_project.dto.ApiUserResponse;
@@ -8,10 +9,7 @@ import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoShareRequestResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoUpdateRequest;
 import com.selcukaloba.to_do_api_project.exception.BaseException;
-import com.selcukaloba.to_do_api_project.service.IAuthService;
-import com.selcukaloba.to_do_api_project.service.IFriendRequestService;
-import com.selcukaloba.to_do_api_project.service.ITeamService;
-import com.selcukaloba.to_do_api_project.service.ITodoService;
+import com.selcukaloba.to_do_api_project.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -43,6 +41,9 @@ public class WebController {
 
     @Autowired
     private ITeamService teamService;
+
+    @Autowired
+    private ICommentService commentService;
 
     @GetMapping("/login")
     public String showLoginPage() {
@@ -242,6 +243,24 @@ public class WebController {
         teamService.deleteTeamTodo(todoId, principal.getName());
         redirectAttributes.addFlashAttribute("successMsg", "Deleted successfully!");
         return "redirect:/teams";
+    }
+
+    @PostMapping("/dashboard/todo/{todoId}/comment")
+    public String addComment(@PathVariable Long todoId, @RequestParam String content, Principal principal, RedirectAttributes redirectAttributes)
+    {
+        commentService.addComment(todoId, principal.getName(), content);
+        redirectAttributes.addFlashAttribute("successMsg", "Comment added!");
+        return "redirect:/dashboard/todo/" + todoId + "/comments";
+    }
+
+    @GetMapping("/dashboard/todo/{todoId}/comments")
+    public String showCommentsPage(@PathVariable Long todoId, Model model, Principal principal)
+    {
+        List<ApiCommentResponse> comments = commentService.getComments(todoId);
+        model.addAttribute("comments", comments);
+        model.addAttribute("todoId", todoId);
+        model.addAttribute("username", principal.getName());
+        return "comments";
     }
 }
 
