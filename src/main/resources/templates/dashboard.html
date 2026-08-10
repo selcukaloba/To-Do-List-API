@@ -87,17 +87,45 @@
 
             <div>
                 <div class="flex justify-between items-start mb-2">
-                    <div class="flex items-center">
+                    <div class="flex items-center gap-1.5 flex-wrap">
                         <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-zinc-100 text-zinc-700 rounded-md"
                               th:text="${todo.taskType}">TYPE</span>
 
+                        <!-- STATUS BADGE - PENDING -->
+                        <span th:if="${todo.status != null and todo.status.name() == 'PENDING'}"
+                              class="text-[10px] font-medium px-2 py-0.5 rounded border shadow-sm bg-amber-50 text-amber-600 border-amber-200">PENDING</span>
+
+                        <!-- STATUS BADGE - IN_PROGRESS -->
+                        <span th:if="${todo.status != null and todo.status.name() == 'IN_PROGRESS'}"
+                              class="text-[10px] font-medium px-2 py-0.5 rounded border shadow-sm bg-blue-50 text-blue-600 border-blue-200">IN PROGRESS</span>
+
+                        <!-- STATUS BADGE - COMPLETED -->
+                        <span th:if="${todo.status != null and todo.status.name() == 'COMPLETED'}"
+                              class="text-[10px] font-medium px-2 py-0.5 rounded border shadow-sm bg-emerald-50 text-emerald-600 border-emerald-200">COMPLETED</span>
+
+                        <!-- STATUS BADGE - FAILED -->
+                        <span th:if="${todo.status != null and todo.status.name() == 'FAILED'}"
+                              class="text-[10px] font-medium px-2 py-0.5 rounded border shadow-sm bg-red-50 text-red-600 border-red-200">FAILED</span>
+
                         <span th:if="${todo.ownerUsername}"
-                              class="text-[10px] ml-2 font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 shadow-sm"
+                              class="text-[10px] font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 shadow-sm"
                               th:text="'👤 from ' + ${todo.ownerUsername}"></span>
+
+                        <span th:if="${todo.assignedToUsername}"
+                              class="text-[10px] font-medium bg-purple-50 text-purple-600 px-2 py-0.5 rounded border border-purple-100 shadow-sm"
+                              th:text="'🎯 ' + ${todo.assignedToUsername}"></span>
                     </div>
 
-                    <div class="flex gap-2">
-                        <button th:onclick="openEditModal([[${todo.id}]], [[${todo.title}]], [[${todo.description}]], [[${todo.taskType}]], [[${todo.dueDate != null ? todo.dueDate.toString() : ''}]], [[${todo.reminderDate != null ? todo.reminderDate.toString() : ''}]], [[${todo.isCompleted != null and todo.isCompleted}]])"
+                    <div class="flex gap-2 flex-shrink-0">
+                        <button th:data-id="${todo.id}"
+                                th:data-title="${todo.title}"
+                                th:data-desc="${todo.description != null ? todo.description : ''}"
+                                th:data-type="${todo.taskType}"
+                                th:data-due="${todo.dueDate != null ? todo.dueDate.toString() : ''}"
+                                th:data-rem="${todo.reminderDate != null ? todo.reminderDate.toString() : ''}"
+                                th:data-completed="${todo.isCompleted != null and todo.isCompleted}"
+                                th:data-status="${todo.status != null ? todo.status.name() : 'PENDING'}"
+                                onclick="openEditModal(this)"
                                 class="text-xs text-zinc-400 hover:text-zinc-900 transition-colors">Edit</button>
 
                         <form th:action="@{/dashboard/todo/delete/{id}(id=${todo.id})}" method="post"
@@ -162,6 +190,17 @@
                 </select>
             </div>
 
+            <!-- STATUS DROPDOWN (sadece edit modunda görünür) -->
+            <div id="statusWrapper" class="hidden">
+                <label class="block text-xs font-medium text-zinc-700 mb-1">Status</label>
+                <select name="status" id="todoStatus" class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:border-zinc-900">
+                    <option value="PENDING">PENDING</option>
+                    <option value="IN_PROGRESS">IN PROGRESS</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                    <option value="FAILED">FAILED</option>
+                </select>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-medium text-zinc-700 mb-1">Due Date</label>
@@ -195,32 +234,50 @@
         todoForm.reset();
         document.getElementById('modalTitle').textContent = 'Create New Task';
         document.getElementById('completedWrapper').classList.add('hidden');
+        document.getElementById('statusWrapper').classList.add('hidden');
 
         todoForm.action = '/dashboard/todo/create';
         todoModal.classList.remove('hidden');
     }
 
-    function openEditModal(id, title, desc, type, due, rem, isComp) {
+    function openEditModal(el) {
+        const id = el.getAttribute('data-id');
+        const title = el.getAttribute('data-title');
+        const desc = el.getAttribute('data-desc');
+        const type = el.getAttribute('data-type');
+        const due = el.getAttribute('data-due');
+        const rem = el.getAttribute('data-rem');
+        const isComp = el.getAttribute('data-completed') === 'true';
+        const status = el.getAttribute('data-status');
+
         document.getElementById('modalTitle').textContent = 'Edit Task';
 
         document.getElementById('todoTitle').value = title;
-        document.getElementById('todoDescription').value = (desc !== 'null' && desc) ? desc : '';
+        document.getElementById('todoDescription').value = (desc && desc !== 'null') ? desc : '';
         document.getElementById('todoTaskType').value = type;
 
-        if (due !== 'null' && due) {
+        // Status alanını göster ve ayarla
+        document.getElementById('statusWrapper').classList.remove('hidden');
+        if (status && status !== 'null') {
+            document.getElementById('todoStatus').value = status;
+        } else {
+            document.getElementById('todoStatus').value = 'PENDING';
+        }
+
+        if (due && due !== 'null') {
             document.getElementById('todoDueDate').value = due.replace(' ', 'T').substring(0, 16);
         } else {
             document.getElementById('todoDueDate').value = '';
         }
 
-        if (rem !== 'null' && rem) {
+        if (rem && rem !== 'null') {
             document.getElementById('todoReminderDate').value = rem.replace(' ', 'T').substring(0, 16);
         } else {
             document.getElementById('todoReminderDate').value = '';
         }
 
         document.getElementById('completedWrapper').classList.remove('hidden');
-        document.getElementById('todoCompleted').checked = (isComp === true || isComp === 'true');
+        document.getElementById('todoCompleted').checked = isComp;
 
         todoForm.action = '/dashboard/todo/update/' + id;
         todoModal.classList.remove('hidden');
