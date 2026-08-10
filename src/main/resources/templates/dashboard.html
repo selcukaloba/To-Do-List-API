@@ -143,9 +143,15 @@
                    th:text="${todo.description ?: 'No description provided.'}">Task description...</p>
             </div>
 
-            <div class="pt-3 border-t border-zinc-100 flex flex-col gap-1 text-[11px] text-zinc-400">
-                <span>🎯 Due: <strong class="text-zinc-600" th:text="${todo.dueDate ?: 'N/A'}">Date</strong></span>
-                <span>⏰ Rem: <span th:text="${todo.reminderDate ?: 'N/A'}">Date</span></span>
+            <div class="pt-3 border-t border-zinc-100 flex justify-between items-center">
+                <div class="flex flex-col gap-1 text-[11px] text-zinc-400">
+                    <span>🎯 Due: <strong class="text-zinc-600" th:text="${todo.dueDate ?: 'N/A'}">Date</strong></span>
+                    <span>⏰ Rem: <span th:text="${todo.reminderDate ?: 'N/A'}">Date</span></span>
+                </div>
+                <a th:href="@{/dashboard/todo/{id}/comments(id=${todo.id})}"
+                   class="text-[10px] font-medium text-zinc-500 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-1 rounded-lg transition-all flex-shrink-0">
+                    💬 Comments
+                </a>
             </div>
         </div>
     </div>
