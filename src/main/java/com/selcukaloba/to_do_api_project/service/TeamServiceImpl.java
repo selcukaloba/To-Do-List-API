@@ -20,6 +20,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -184,6 +186,29 @@ public class TeamServiceImpl implements ITeamService{
         }
 
         todoRepository.save(todo);
+    }
+
+    @Override
+    public List<ApiTodoResponse> getTeamTodosByMonth(Long teamId, int year, int month) {
+        LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
+        LocalDateTime endDate = startDate.plusMonths(1).minusSeconds(1);
+        List<Todo> todos = todoRepository.findByTeamIdAndDueDateBetween(teamId, startDate, endDate);
+
+
+        return todos.stream()
+                .map(todo -> {
+                    ApiTodoResponse response = new ApiTodoResponse();
+                    BeanUtils.copyProperties(todo, response);
+                    if (todo.getUser() != null) response.setOwnerUsername(todo.getUser().getUsername());
+                    if (todo.getTeam() != null) {
+                        response.setTeamId(todo.getTeam().getId());
+                        response.setTeamName(todo.getTeam().getName());
+                    }
+                    if (todo.getAssignedTo() != null) response.setAssignedToUsername(todo.getAssignedTo().getUsername());
+                    System.out.println("  Todo: " + response.getTitle() + " | DueDate: " + response.getDueDate());
+                    return response;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

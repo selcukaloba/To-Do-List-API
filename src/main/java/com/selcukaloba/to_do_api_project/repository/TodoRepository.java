@@ -10,10 +10,13 @@ import java.util.List;
 
 public interface TodoRepository extends JpaRepository<Todo, Long> {
     List<Todo> findByIsCompletedFalseAndReminderDateBetween(LocalDateTime start, LocalDateTime end);
+
     List<Todo> findByIsCompletedFalse();
+
     @Query("SELECT t FROM Todo t WHERE t.user.username = :username " +
             "OR EXISTS (SELECT ts FROM TodoShare ts WHERE ts.todo = t AND ts.sharedUser.username = :username)")
     List<Todo> findAllTodosByOwnerOrSharedUser(@Param("username") String username);
+
     @Query("SELECT t FROM Todo t WHERE t.isCompleted = false " +
             "AND t.reminderDate BETWEEN :startDate AND :endDate " +
             "AND (t.user.username = :username OR EXISTS (SELECT ts FROM TodoShare ts WHERE ts.todo = t AND ts.sharedUser.username = :username))")
@@ -22,7 +25,17 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
             @Param("endDate") LocalDateTime endDate,
             @Param("username") String username
     );
+
     List<Todo> findByUserUsername(String username);
+
     @Query("SELECT t FROM Todo t WHERE t.team.id = :teamId ORDER BY t.createdAt DESC")
     List<Todo> findByTeamId(@Param("teamId") Long teamId);
+
+    @Query("SELECT t FROM Todo t WHERE t.team.id = :teamId " +
+            "AND t.dueDate BETWEEN :startDate AND :endDate " +
+            "ORDER BY t.dueDate ASC")
+    List<Todo> findByTeamIdAndDueDateBetween(@Param("teamId") Long teamId,
+                                             @Param("startDate") LocalDateTime startDate,
+                                             @Param("endDate") LocalDateTime endDate);
 }
+
