@@ -16,4 +16,5 @@ public interface ITeamService {
     ApiTodoResponse assignTodoToTeam(ApiTodoCreateRequest request, String leaderUsername);
     void deleteTeamTodo(Long todoId, String leaderUsername);
     void assignExistingTodoToTeam(Long teamId, Long todoId, String assignedToUsername, String leaderUsername);
+    List<ApiTodoResponse> getTeamTodosByMonth(Long teamId, int year, int month);
 }

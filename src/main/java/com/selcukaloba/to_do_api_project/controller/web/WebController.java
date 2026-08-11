@@ -1,9 +1,6 @@
 package com.selcukaloba.to_do_api_project.controller.web;
 
-import com.selcukaloba.to_do_api_project.dto.ApiCommentResponse;
-import com.selcukaloba.to_do_api_project.dto.ApiFriendRequestResponse;
-import com.selcukaloba.to_do_api_project.dto.ApiRegisterRequest;
-import com.selcukaloba.to_do_api_project.dto.ApiUserResponse;
+import com.selcukaloba.to_do_api_project.dto.*;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoCreateRequest;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoShareRequestResponse;
@@ -17,12 +14,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import java.security.Principal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class WebController {
@@ -62,20 +61,116 @@ public class WebController {
     }
 
     @GetMapping("/dashboard")
-    public String showDashboardPage(@RequestParam(value = "days", required = false) Integer days, Model model, Principal principal) {
+    public String showDashboardPage(@RequestParam(value = "days", required = false) Integer days,
+                                    @RequestParam(value = "view", required = false) String view,
+                                    @RequestParam(value = "teamId", required = false) Long teamId,
+                                    @RequestParam(value = "month", required = false) String month,
+                                    Model model, Principal principal) {
         String username = principal.getName();
-        List<ApiTodoResponse> todos;
 
+        model.addAttribute("teams", teamService.getTeams(username));
+        model.addAttribute("username", username);
+
+        // SADECE "team" şartını arıyoruz. teamId null olsa bile buraya girmeli.
+        if ("team".equals(view)) {
+            model.addAttribute("view", "team");
+            model.addAttribute("newTodo", new ApiTodoCreateRequest());
+
+            // Eğer kullanıcı dropdown'dan bir takım seçmişse (teamId null değilse) takvimi doldur
+            if (teamId != null) {
+                int year = java.time.Year.now().getValue();
+                int monthValue = java.time.LocalDate.now().getMonthValue();
+
+                if (month != null && month.matches("\\d{4}-\\d{2}")) {
+                    String[] parts = month.split("-");
+                    year = Integer.parseInt(parts[0]);
+                    monthValue = Integer.parseInt(parts[1]);
+                }
+
+                List<ApiTodoResponse> teamTodos = teamService.getTeamTodosByMonth(teamId, year, monthValue);
+                ApiTeamResponse selectedTeam = teamService.getTeamDetail(teamId);
+
+                model.addAttribute("dayHeaders", List.of("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"));
+
+                String monthName = java.time.Month.of(monthValue).name();
+                monthName = monthName.charAt(0) + monthName.substring(1).toLowerCase();
+                model.addAttribute("monthLabel", monthName + " " + year);
+
+                int prevYear = (monthValue == 1) ? year - 1 : year;
+                int prevMonth = (monthValue == 1) ? 12 : monthValue - 1;
+                int nextYear = (monthValue == 12) ? year + 1 : year;
+                int nextMonth = (monthValue == 12) ? 1 : monthValue + 1;
+
+                model.addAttribute("prevMonth", String.format("%d-%02d", prevYear, prevMonth));
+                model.addAttribute("nextMonth", String.format("%d-%02d", nextYear, nextMonth));
+                model.addAttribute("calendarData", buildCalendarData(year, monthValue, teamTodos));
+                model.addAttribute("selectedTeam", selectedTeam);
+                model.addAttribute("teamTodos", teamTodos);
+            }
+
+            return "dashboard";
+        }
+
+        // --- WORKSPACE (VARSAYILAN) GÖRÜNÜMÜ ---
+        List<ApiTodoResponse> todos;
         if (days != null) {
             todos = todoService.getUpcomingReminders(username, days);
         } else {
             todos = todoService.getAllTodo(username);
         }
 
-        model.addAttribute("username", username);
         model.addAttribute("todos", todos);
         model.addAttribute("newTodo", new ApiTodoCreateRequest());
+        model.addAttribute("view", "workspace");
+
         return "dashboard";
+    }
+
+    private List<Map<String, Object>> buildCalendarData(int year, int month, List<ApiTodoResponse> teamTodos) {
+        List<Map<String, Object>> calendar = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        LocalDate firstDay = LocalDate.of(year, month, 1);
+        int daysInMonth = firstDay.lengthOfMonth();
+
+        int startDayOfWeek = firstDay.getDayOfWeek().getValue();
+        for (int i = 1; i < startDayOfWeek; i++) {
+            Map<String, Object> emptyDay = new HashMap<>();
+            emptyDay.put("day", null);
+            emptyDay.put("currentMonth", false);
+            emptyDay.put("today", false);
+            emptyDay.put("todos", Collections.emptyList());
+            calendar.add(emptyDay);
+        }
+
+        for (int day = 1; day <= daysInMonth; day++) {
+            LocalDate date = LocalDate.of(year, month, day);
+            Map<String, Object> dayData = new HashMap<>();
+            dayData.put("day", day);
+            dayData.put("currentMonth", true);
+            dayData.put("today", date.equals(today));
+
+            List<ApiTodoResponse> dayTodos = teamTodos.stream()
+                    .filter(t -> t.getDueDate() != null && t.getDueDate().toLocalDate().equals(date))
+                    .collect(Collectors.toList());
+
+            if (!dayTodos.isEmpty()) {
+                System.out.println("  Day " + day + ": " + dayTodos.size() + " todos");
+            }
+
+            dayData.put("todos", dayTodos);
+            calendar.add(dayData);
+        }
+
+        while (calendar.size() % 7 != 0) {
+            Map<String, Object> emptyDay = new HashMap<>();
+            emptyDay.put("day", null);
+            emptyDay.put("currentMonth", false);
+            emptyDay.put("today", false);
+            emptyDay.put("todos", Collections.emptyList());
+            calendar.add(emptyDay);
+        }
+
+        return calendar;
     }
 
     @PostMapping("/dashboard/todo/create")
@@ -262,5 +357,7 @@ public class WebController {
         model.addAttribute("username", principal.getName());
         return "comments";
     }
+
+
 }
 
