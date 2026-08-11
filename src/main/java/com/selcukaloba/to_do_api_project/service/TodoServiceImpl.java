@@ -88,11 +88,11 @@ public class TodoServiceImpl implements ITodoService{
     @Transactional
     public void deleteTodo(Long id, String username) {
         Todo todo = todoRepository.findById(id).orElseThrow(()->new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NO_RECORD_EXISTS)));
-
         User currentUser = userRepository.findByUsername(username).orElseThrow(()->new BaseException(new ErrorMessage(username, MessageType.USERNAME_NOT_FOUND)));
 
         if(todo.getUser().getUsername().equals(username))
         {
+            commentRepository.deleteByTodoId(id);
             todoShareRequestRepository.deleteAllByTodoId(id);
             todoShareRepository.deleteAllByTodoId(id);
             todoRepository.delete(todo);

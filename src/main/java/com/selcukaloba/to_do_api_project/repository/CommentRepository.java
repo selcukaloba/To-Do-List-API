@@ -9,4 +9,5 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByTodoIdOrderByCreatedAtAsc(Long todoId);
     int countByTodoId(Long todoId);
+    void deleteByTodoId(Long todoId);
 }
