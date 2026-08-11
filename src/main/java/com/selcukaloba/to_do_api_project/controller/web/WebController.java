@@ -279,6 +279,13 @@ public class WebController {
     @GetMapping("/teams")
     public String showTeamsPage(Model model, Principal principal) {
         String username = principal.getName();
+
+        List<ApiTeamResponse> teams = teamService.getTeams(username);
+        System.out.println("=== " + username + " teams count: " + teams.size());
+        for (ApiTeamResponse t : teams) {
+            System.out.println("Team: " + t.getName() + " | Leader: " + t.getLeaderUsername());
+        }
+
         model.addAttribute("teams", teamService.getTeams(username));
         model.addAttribute("friends", friendRequestService.getAllFriends(username));
         model.addAttribute("myTodos", todoService.getAllTodo(username).stream()
@@ -356,6 +363,32 @@ public class WebController {
         model.addAttribute("todoId", todoId);
         model.addAttribute("username", principal.getName());
         return "comments";
+    }
+
+    // Show Tasks sayfası
+    @GetMapping("/teams/{teamId}/tasks")
+    public String showTeamTasks(@PathVariable Long teamId, Model model, Principal principal) {
+        List<ApiTodoResponse> tasks = teamService.getTeamTodos(teamId);
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("team", teamService.getTeamDetail(teamId));
+        model.addAttribute("username", principal.getName());
+        return "team-tasks";
+    }
+
+    // Delete Team
+    @PostMapping("/teams/{teamId}/delete")
+    public String deleteTeam(@PathVariable Long teamId, Principal principal, RedirectAttributes redirectAttributes) {
+        teamService.deleteTeam(teamId, principal.getName());
+        redirectAttributes.addFlashAttribute("successMsg", "Team deleted successfully!");
+        return "redirect:/teams";
+    }
+
+    // Leave Team
+    @PostMapping("/teams/{teamId}/leave")
+    public String leaveTeam(@PathVariable Long teamId, Principal principal, RedirectAttributes redirectAttributes) {
+        teamService.leaveTeam(teamId, principal.getName());
+        redirectAttributes.addFlashAttribute("successMsg", "You left the team!");
+        return "redirect:/teams";
     }
 
 

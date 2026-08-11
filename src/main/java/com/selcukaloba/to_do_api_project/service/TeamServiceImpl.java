@@ -15,6 +15,7 @@ import com.selcukaloba.to_do_api_project.repository.TeamMemberRepository;
 import com.selcukaloba.to_do_api_project.repository.TeamRepository;
 import com.selcukaloba.to_do_api_project.repository.TodoRepository;
 import com.selcukaloba.to_do_api_project.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class TeamServiceImpl implements ITeamService{
 
     @Autowired
     private TodoRepository todoRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Override
     @Transactional
@@ -209,6 +213,53 @@ public class TeamServiceImpl implements ITeamService{
                     return response;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteTeam(Long teamId, String leaderUsername) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("Team: " + teamId, MessageType.TEAM_NOT_FOUND)));
+
+        if (!team.getLeader().getUsername().equals(leaderUsername)) {
+            throw new BaseException(new ErrorMessage(leaderUsername, MessageType.NOT_TEAM_LEADER));
+        }
+
+        // Team'e ait todoların team_id'sini null yap (veya sil)
+        List<Todo> teamTodos = todoRepository.findByTeamId(teamId);
+        for (Todo todo : teamTodos) {
+            todo.setTeam(null);
+            todo.setAssignedTo(null);
+        }
+        todoRepository.saveAll(teamTodos);
+
+        // Üyeleri sil
+        teamMemberRepository.deleteAll(team.getMembers());
+        // Team'i sil
+        teamRepository.delete(team);
+    }
+
+    @Override
+    @Transactional
+    public void leaveTeam(Long teamId, String username) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("Team: " + teamId, MessageType.TEAM_NOT_FOUND)));
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BaseException(new ErrorMessage(username, MessageType.USERNAME_NOT_FOUND)));
+
+        // Bu üyeye atanmış todoların assignedTo'sunu null yap
+        List<Todo> teamTodos = todoRepository.findByTeamId(teamId);
+        for (Todo todo : teamTodos) {
+            if (todo.getAssignedTo() != null && todo.getAssignedTo().getUsername().equals(username)) {
+                todo.setAssignedTo(null);
+            }
+        }
+
+        // Native query ile direkt sil
+        teamMemberRepository.deleteByTeamIdAndUsername(teamId, username);
+
+        System.out.println("=== Member deleted for user: " + username + " from team: " + teamId);
     }
 
     @Override
