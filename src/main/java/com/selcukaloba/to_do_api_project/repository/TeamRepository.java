@@ -2,6 +2,7 @@ package com.selcukaloba.to_do_api_project.repository;
 
 import com.selcukaloba.to_do_api_project.entity.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -19,4 +20,8 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
 
     Optional<Team> findById(Long teamId);
     boolean existsByNameAndLeaderUsername(String name, String leaderUsername);
+
+    @Modifying
+    @Query("DELETE FROM TeamMember tm WHERE tm.team.id = :teamId AND tm.user.username = :username")
+    void deleteByTeamIdAndUsername(@Param("teamId") Long teamId, @Param("username") String username);
 }

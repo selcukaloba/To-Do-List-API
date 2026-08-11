@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Todo API — Teams</title>
+    <title>Todo API — Team Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .bg-grid {
@@ -24,7 +24,7 @@
             <div class="w-2.5 h-2.5 bg-white"></div>
         </div>
         <span class="font-semibold tracking-tight text-base text-zinc-900">todo.api</span>
-        <span class="text-xs bg-zinc-200/60 text-zinc-700 px-2 py-0.5 rounded-full font-medium ml-2">Teams</span>
+        <span class="text-xs bg-zinc-200/60 text-zinc-700 px-2 py-0.5 rounded-full font-medium ml-2">Team Management</span>
     </div>
 
     <div class="flex items-center gap-4">
@@ -69,20 +69,44 @@
             </div>
 
             <!-- SADECE LEADER İSE BUTONLARI GÖSTER -->
-            <div th:if="${team.leaderUsername == username}" class="flex gap-2">
-                <button th:data-team-id="${team.id}" onclick="openAddMemberModal(this.getAttribute('data-team-id'))"
-                        class="text-xs bg-zinc-100 hover:bg-zinc-200 text-zinc-700 px-3 py-1.5 rounded-lg transition-all font-medium">
-                    + Add Member
-                </button>
-                <button th:data-team-id="${team.id}" onclick="openAssignTodoModal(this.getAttribute('data-team-id'))"
-                        class="text-xs bg-zinc-900 hover:bg-zinc-800 text-white px-3 py-1.5 rounded-lg transition-all font-medium">
-                    Assign Task
-                </button>
+            <div th:if="${team.leaderUsername == username}" class="space-y-2">
+                <div class="flex gap-2">
+                    <button th:data-team-id="${team.id}" onclick="openAddMemberModal(this.getAttribute('data-team-id'))"
+                            class="text-xs bg-zinc-100 hover:bg-zinc-200 text-zinc-700 px-3 py-1.5 rounded-lg transition-all font-medium">
+                        + Add Member
+                    </button>
+                    <button th:data-team-id="${team.id}" onclick="openAssignTodoModal(this.getAttribute('data-team-id'))"
+                            class="text-xs bg-zinc-900 hover:bg-zinc-800 text-white px-3 py-1.5 rounded-lg transition-all font-medium">
+                        Assign Task
+                    </button>
+                </div>
+                <div class="flex gap-2">
+                    <a th:href="@{/teams/{id}/tasks(id=${team.id})}"
+                       class="text-xs bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-lg transition-all font-medium text-center flex-1">
+                        📋 Show Tasks
+                    </a>
+                    <form th:action="@{/teams/{id}/delete(id=${team.id})}" method="post"
+                          onsubmit="return confirm('Delete this team and all its tasks? This cannot be undone.');" class="m-0 flex-1">
+                        <button type="submit" class="w-full text-xs bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg transition-all font-medium">
+                            🗑 Delete
+                        </button>
+                    </form>
+                </div>
             </div>
 
-            <!-- LEADER DEĞİLSE SADECE MEMBER BADGE'I GÖSTER -->
+            <!-- LEADER DEĞİLSE MEMBER BUTONLARI -->
             <div th:unless="${team.leaderUsername == username}" class="flex gap-2">
                 <span class="text-[10px] text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 font-medium">Member</span>
+                <a th:href="@{/teams/{id}/tasks(id=${team.id})}"
+                   class="text-xs bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-lg transition-all font-medium">
+                    📋 Tasks
+                </a>
+                <form th:action="@{/teams/{id}/leave(id=${team.id})}" method="post"
+                      onsubmit="return confirm('Leave this team?');" class="m-0">
+                    <button type="submit" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg transition-all font-medium">
+                        🚪 Leave
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -147,7 +171,6 @@
             <button onclick="closeAssignTodoModal()" type="button" class="text-zinc-400 hover:text-zinc-700 text-lg">&times;</button>
         </div>
 
-        <!-- Seçenek 1: Mevcut task'ı ata -->
         <form id="assignExistingForm" method="post" class="space-y-4 mb-6 pb-6 border-b border-zinc-200">
             <p class="text-xs font-medium text-zinc-500">Assign an existing task</p>
             <div>
@@ -169,7 +192,6 @@
             </button>
         </form>
 
-        <!-- Seçenek 2: Yeni task oluştur -->
         <form id="assignTodoForm" method="post" class="space-y-4">
             <p class="text-xs font-medium text-zinc-500">Or create a new task</p>
             <div>
