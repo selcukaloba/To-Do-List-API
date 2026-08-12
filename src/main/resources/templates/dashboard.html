@@ -97,7 +97,7 @@
 
         <div th:unless="${#lists.isEmpty(todos)}" id="todoGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div th:each="todo : ${todos}"
-                 th:classappend="${todo.isCompleted != null and todo.isCompleted} ? 'opacity-60 bg-zinc-50' : 'bg-white hover:border-zinc-300'"
+                 th:classappend="${todo.status != null and todo.status.name() == 'COMPLETED'} ? 'opacity-60 bg-zinc-50' : 'bg-white hover:border-zinc-300'"
                  class="border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] transition-all flex flex-col justify-between">
 
                 <div>
@@ -130,7 +130,6 @@
                                     th:data-type="${todo.taskType}"
                                     th:data-due="${todo.dueDate != null ? todo.dueDate.toString() : ''}"
                                     th:data-rem="${todo.reminderDate != null ? todo.reminderDate.toString() : ''}"
-                                    th:data-completed="${todo.isCompleted != null and todo.isCompleted}"
                                     th:data-status="${todo.status != null ? todo.status.name() : 'PENDING'}"
                                     onclick="openEditModal(this)"
                                     class="text-xs text-zinc-400 hover:text-zinc-900 transition-colors">Edit</button>
@@ -141,7 +140,7 @@
                         </div>
                     </div>
 
-                    <h4 th:classappend="${todo.isCompleted != null and todo.isCompleted} ? 'line-through' : ''"
+                    <h4 th:classappend="${todo.status != null and todo.status.name() == 'COMPLETED'} ? 'line-through' : ''"
                         class="font-semibold text-sm text-zinc-900 mb-1"
                         th:text="${todo.title}">Task Title</h4>
                     <p class="text-xs text-zinc-500 mb-4 line-clamp-2"
@@ -222,28 +221,24 @@
 
                             <div class="space-y-0.5">
                                 <th:block th:each="todo : ${entry.todos}">
-                                    <!-- PENDING -->
                                     <div th:if="${todo.status.name() == 'PENDING'}"
                                          class="text-[9px] px-1.5 py-0.5 rounded truncate cursor-default bg-amber-100 text-amber-700"
                                          th:attr="title=${todo.title} + (${todo.assignedToUsername != null} ? ' - ' + ${todo.assignedToUsername} : '')">
                                         <span th:text="${todo.title}">Task</span>
                                         <span th:if="${todo.assignedToUsername}" th:text="' - ' + ${todo.assignedToUsername}" class="opacity-70"></span>
                                     </div>
-                                    <!-- IN_PROGRESS -->
                                     <div th:if="${todo.status.name() == 'IN_PROGRESS'}"
                                          class="text-[9px] px-1.5 py-0.5 rounded truncate cursor-default bg-blue-100 text-blue-700"
                                          th:attr="title=${todo.title} + (${todo.assignedToUsername != null} ? ' - ' + ${todo.assignedToUsername} : '')">
                                         <span th:text="${todo.title}">Task</span>
                                         <span th:if="${todo.assignedToUsername}" th:text="' - ' + ${todo.assignedToUsername}" class="opacity-70"></span>
                                     </div>
-                                    <!-- COMPLETED -->
                                     <div th:if="${todo.status.name() == 'COMPLETED'}"
                                          class="text-[9px] px-1.5 py-0.5 rounded truncate cursor-default bg-emerald-100 text-emerald-700"
                                          th:attr="title=${todo.title} + (${todo.assignedToUsername != null} ? ' - ' + ${todo.assignedToUsername} : '')">
                                         <span th:text="${todo.title}">Task</span>
                                         <span th:if="${todo.assignedToUsername}" th:text="' - ' + ${todo.assignedToUsername}" class="opacity-70"></span>
                                     </div>
-                                    <!-- FAILED -->
                                     <div th:if="${todo.status.name() == 'FAILED'}"
                                          class="text-[9px] px-1.5 py-0.5 rounded truncate cursor-default bg-red-100 text-red-700"
                                          th:attr="title=${todo.title} + (${todo.assignedToUsername != null} ? ' - ' + ${todo.assignedToUsername} : '')">
@@ -318,11 +313,6 @@
                     <input type="datetime-local" th:field="*{reminderDate}" id="todoReminderDate" class="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-900" />
                 </div>
             </div>
-            <div id="completedWrapper" class="hidden flex items-center mt-2">
-                <input type="hidden" name="isCompleted" value="false" />
-                <input type="checkbox" id="todoCompleted" name="isCompleted" value="true" class="w-4 h-4 text-zinc-900 bg-zinc-50 border-zinc-300 rounded focus:ring-zinc-900 focus:ring-2" />
-                <label for="todoCompleted" class="ml-2 text-xs font-medium text-zinc-700">Mark as completed</label>
-            </div>
             <div class="pt-3 flex justify-end gap-2 border-t border-zinc-100">
                 <button type="button" onclick="closeModal()" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-medium rounded-lg transition-all">Cancel</button>
                 <button type="submit" id="saveBtn" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg transition-all">Save Task</button>
@@ -338,7 +328,6 @@
     function openModal() {
         todoForm.reset();
         document.getElementById('modalTitle').textContent = 'Create New Task';
-        document.getElementById('completedWrapper').classList.add('hidden');
         document.getElementById('statusWrapper').classList.add('hidden');
         todoForm.action = '/dashboard/todo/create';
         todoModal.classList.remove('hidden');
@@ -351,7 +340,6 @@
         const type = el.getAttribute('data-type');
         const due = el.getAttribute('data-due');
         const rem = el.getAttribute('data-rem');
-        const isComp = el.getAttribute('data-completed') === 'true';
         const status = el.getAttribute('data-status');
 
         document.getElementById('modalTitle').textContent = 'Edit Task';
@@ -377,9 +365,6 @@
         } else {
             document.getElementById('todoReminderDate').value = '';
         }
-
-        document.getElementById('completedWrapper').classList.remove('hidden');
-        document.getElementById('todoCompleted').checked = isComp;
 
         todoForm.action = '/dashboard/todo/update/' + id;
         todoModal.classList.remove('hidden');
