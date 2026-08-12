@@ -63,7 +63,6 @@
     <div th:if="${errorMsg}" th:text="${errorMsg}" class="mb-6 p-4 rounded-xl text-xs font-medium bg-red-50 border border-red-200 text-red-600 shadow-sm"></div>
     <div th:if="${successMsg}" th:text="${successMsg}" class="mb-6 p-4 rounded-xl text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-700 shadow-sm"></div>
 
-    <!-- ===================== WORKSPACE GÖRÜNÜMÜ ===================== -->
     <div th:unless="${view == 'team'}">
 
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-6 border-b border-zinc-200/60">
@@ -169,9 +168,7 @@
         </div>
 
     </div>
-    <!-- ===================== WORKSPACE SONU ===================== -->
 
-    <!-- ===================== TEAM TAKVİM ===================== -->
     <div th:if="${view == 'team'}">
 
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-6 border-b border-zinc-200/60">
@@ -262,11 +259,10 @@
         </div>
 
     </div>
-    <!-- ===================== TEAM TAKVİM SONU ===================== -->
 
 </main>
 
-<!-- TODO MODAL -->
+
 <div id="todoModal" class="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white border border-zinc-200 rounded-2xl max-w-md w-full p-6 shadow-2xl transition-all max-h-[90vh] overflow-y-auto no-scrollbar">
         <div class="flex justify-between items-center mb-5">
