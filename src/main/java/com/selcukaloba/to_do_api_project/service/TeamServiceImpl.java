@@ -233,9 +233,7 @@ public class TeamServiceImpl implements ITeamService{
         }
         todoRepository.saveAll(teamTodos);
 
-        // Üyeleri sil
         teamMemberRepository.deleteAll(team.getMembers());
-        // Team'i sil
         teamRepository.delete(team);
     }
 
@@ -248,7 +246,6 @@ public class TeamServiceImpl implements ITeamService{
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BaseException(new ErrorMessage(username, MessageType.USERNAME_NOT_FOUND)));
 
-        // Bu üyeye atanmış todoların assignedTo'sunu null yap
         List<Todo> teamTodos = todoRepository.findByTeamId(teamId);
         for (Todo todo : teamTodos) {
             if (todo.getAssignedTo() != null && todo.getAssignedTo().getUsername().equals(username)) {
@@ -256,7 +253,6 @@ public class TeamServiceImpl implements ITeamService{
             }
         }
 
-        // Native query ile direkt sil
         teamMemberRepository.deleteByTeamIdAndUsername(teamId, username);
 
         System.out.println("=== Member deleted for user: " + username + " from team: " + teamId);

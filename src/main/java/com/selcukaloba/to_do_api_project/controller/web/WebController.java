@@ -71,12 +71,10 @@ public class WebController {
         model.addAttribute("teams", teamService.getTeams(username));
         model.addAttribute("username", username);
 
-        // SADECE "team" şartını arıyoruz. teamId null olsa bile buraya girmeli.
         if ("team".equals(view)) {
             model.addAttribute("view", "team");
             model.addAttribute("newTodo", new ApiTodoCreateRequest());
 
-            // Eğer kullanıcı dropdown'dan bir takım seçmişse (teamId null değilse) takvimi doldur
             if (teamId != null) {
                 int year = java.time.Year.now().getValue();
                 int monthValue = java.time.LocalDate.now().getMonthValue();
@@ -111,7 +109,6 @@ public class WebController {
             return "dashboard";
         }
 
-        // --- WORKSPACE (VARSAYILAN) GÖRÜNÜMÜ ---
         List<ApiTodoResponse> todos;
         if (days != null) {
             todos = todoService.getUpcomingReminders(username, days);
@@ -365,7 +362,6 @@ public class WebController {
         return "comments";
     }
 
-    // Show Tasks sayfası
     @GetMapping("/teams/{teamId}/tasks")
     public String showTeamTasks(@PathVariable Long teamId, Model model, Principal principal) {
         List<ApiTodoResponse> tasks = teamService.getTeamTodos(teamId);
@@ -375,7 +371,6 @@ public class WebController {
         return "team-tasks";
     }
 
-    // Delete Team
     @PostMapping("/teams/{teamId}/delete")
     public String deleteTeam(@PathVariable Long teamId, Principal principal, RedirectAttributes redirectAttributes) {
         teamService.deleteTeam(teamId, principal.getName());
@@ -383,7 +378,6 @@ public class WebController {
         return "redirect:/teams";
     }
 
-    // Leave Team
     @PostMapping("/teams/{teamId}/leave")
     public String leaveTeam(@PathVariable Long teamId, Principal principal, RedirectAttributes redirectAttributes) {
         teamService.leaveTeam(teamId, principal.getName());
