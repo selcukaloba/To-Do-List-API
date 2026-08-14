@@ -57,7 +57,7 @@
         </button>
     </div>
 
-    <!-- Teams List -->
+
     <div th:if="${teams != null && !teams.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div th:each="team : ${teams}" class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
             <div class="flex justify-between items-start mb-3">
@@ -68,7 +68,7 @@
                 <span th:text="${team.members.size()} + ' members'">0 members</span>
             </div>
 
-            <!-- SADECE LEADER İSE BUTONLARI GÖSTER -->
+
             <div th:if="${team.leaderUsername == username}" class="space-y-2">
                 <div class="flex gap-2">
                     <button th:data-team-id="${team.id}" onclick="openAddMemberModal(this.getAttribute('data-team-id'))"
@@ -94,7 +94,7 @@
                 </div>
             </div>
 
-            <!-- LEADER DEĞİLSE MEMBER BUTONLARI -->
+
             <div th:unless="${team.leaderUsername == username}" class="flex gap-2">
                 <span class="text-[10px] text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 font-medium">Member</span>
                 <a th:href="@{/teams/{id}/tasks(id=${team.id})}"
@@ -120,7 +120,6 @@
     </div>
 </main>
 
-<!-- Create Team Modal -->
 <div id="createTeamModal" class="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white border border-zinc-200 rounded-2xl max-w-md w-full p-6 shadow-2xl">
         <div class="flex justify-between items-center mb-5">
@@ -140,7 +139,6 @@
     </div>
 </div>
 
-<!-- Add Member Modal -->
 <div id="addMemberModal" class="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white border border-zinc-200 rounded-2xl max-w-md w-full p-6 shadow-2xl">
         <div class="flex justify-between items-center mb-5">
@@ -163,7 +161,6 @@
     </div>
 </div>
 
-<!-- Assign Todo Modal -->
 <div id="assignTodoModal" class="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white border border-zinc-200 rounded-2xl max-w-md w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
         <div class="flex justify-between items-center mb-5">
