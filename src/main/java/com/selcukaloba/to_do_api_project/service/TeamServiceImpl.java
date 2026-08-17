@@ -115,7 +115,20 @@ public class TeamServiceImpl implements ITeamService{
     }
 
     @Override
-    public List<ApiTodoResponse> getTeamTodos(Long teamId) {
+    public List<ApiTodoResponse> getTeamTodos(Long teamId, String username) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("Team: " + teamId, MessageType.TEAM_NOT_FOUND)));
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BaseException(new ErrorMessage(username, MessageType.USERNAME_NOT_FOUND)));
+
+        boolean isLeader = team.getLeader().getUsername().equals(username);
+        boolean isMember = teamMemberRepository.existsByTeamAndUser(team, user);
+
+        if (!isLeader && !isMember) {
+            throw new BaseException(new ErrorMessage(username, MessageType.NOT_TEAM_MEMBER));
+        }
+
         return todoRepository.findByTeamId(teamId).stream()
                 .map(todo -> {
                     ApiTodoResponse response = new ApiTodoResponse();

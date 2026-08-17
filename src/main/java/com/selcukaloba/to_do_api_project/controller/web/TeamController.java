@@ -100,7 +100,7 @@ public class TeamController {
 
     @GetMapping("/teams/{teamId}/tasks")
     public String showTeamTasks(@PathVariable Long teamId, Model model, Principal principal) {
-        List<ApiTodoResponse> tasks = teamService.getTeamTodos(teamId);
+        List<ApiTodoResponse> tasks = teamService.getTeamTodos(teamId, principal.getName());
         model.addAttribute("tasks", tasks);
         model.addAttribute("team", teamService.getTeamDetail(teamId));
         model.addAttribute("username", principal.getName());

@@ -19,7 +19,7 @@ public class CommentController {
 
     @GetMapping("/dashboard/todo/{todoId}/comments")
     public String showCommentsPage(@PathVariable Long todoId, Model model, Principal principal) {
-        List<ApiCommentResponse> comments = commentService.getComments(todoId);
+        List<ApiCommentResponse> comments = commentService.getComments(todoId, principal.getName());
         model.addAttribute("comments", comments);
         model.addAttribute("todoId", todoId);
         model.addAttribute("username", principal.getName());
