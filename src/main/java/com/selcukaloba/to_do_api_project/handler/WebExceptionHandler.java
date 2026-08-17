@@ -1,6 +1,6 @@
 package com.selcukaloba.to_do_api_project.handler;
 
-import com.selcukaloba.to_do_api_project.controller.web.WebController;
+import com.selcukaloba.to_do_api_project.controller.web.*;
 import com.selcukaloba.to_do_api_project.exception.BaseException;
 import com.selcukaloba.to_do_api_project.exception.ErrorMessage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +16,13 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Locale;
 
-@ControllerAdvice(assignableTypes = {WebController.class})
+@ControllerAdvice(assignableTypes = {
+        AuthController.class,
+        DashboardController.class,
+        FriendsController.class,
+        TeamController.class,
+        CommentController.class
+})
 public class WebExceptionHandler {
 
     @Autowired

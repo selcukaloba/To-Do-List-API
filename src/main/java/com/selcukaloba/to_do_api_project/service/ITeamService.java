@@ -5,6 +5,7 @@ import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoCreateRequest;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ITeamService {
     ApiTeamResponse createTeam(String name, String leaderUsername);
@@ -19,4 +20,5 @@ public interface ITeamService {
     List<ApiTodoResponse> getTeamTodosByMonth(Long teamId, int year, int month);
     void deleteTeam(Long teamId, String leaderUsername);
     void leaveTeam(Long teamId, String username);
+    Map<String, Object> buildCalendarData(int year, int month, Long teamId);
 }
