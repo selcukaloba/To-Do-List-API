@@ -13,7 +13,7 @@ public interface ITeamService {
     void removeMember(Long teamId, String memberUsername, String leaderUsername);
     List<ApiTeamResponse> getTeams(String username);
     ApiTeamResponse getTeamDetail(Long teamId);
-    List<ApiTodoResponse> getTeamTodos(Long teamId);
+    List<ApiTodoResponse> getTeamTodos(Long teamId, String username);
     ApiTodoResponse assignTodoToTeam(ApiTodoCreateRequest request, String leaderUsername);
     void deleteTeamTodo(Long todoId, String leaderUsername);
     void assignExistingTodoToTeam(Long teamId, Long todoId, String assignedToUsername, String leaderUsername);

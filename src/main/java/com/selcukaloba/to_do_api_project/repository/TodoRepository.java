@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface TodoRepository extends JpaRepository<Todo, Long> {
     List<Todo> findByIsCompletedFalseAndReminderDateBetween(LocalDateTime start, LocalDateTime end);
@@ -37,5 +38,11 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
     List<Todo> findByTeamIdAndDueDateBetween(@Param("teamId") Long teamId,
                                              @Param("startDate") LocalDateTime startDate,
                                              @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT t FROM Todo t WHERE t.id = :todoId AND " +
+            "(t.user.username = :username OR " +
+            "EXISTS (SELECT ts FROM TodoShare ts WHERE ts.todo = t AND ts.sharedUser.username = :username) OR " +
+            "EXISTS (SELECT tm FROM TeamMember tm WHERE tm.team = t.team AND tm.user.username = :username))")
+    Optional<Todo> findByIdAndAuthorizedUser(@Param("todoId") Long todoId, @Param("username") String username);
 }
 

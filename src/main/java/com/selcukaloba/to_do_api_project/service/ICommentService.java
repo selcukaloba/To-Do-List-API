@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ICommentService {
     ApiCommentResponse addComment(Long todoId, String username, String content);
-    List<ApiCommentResponse > getComments(Long todoId);
+    List<ApiCommentResponse> getComments(Long todoId, String username);
 }
