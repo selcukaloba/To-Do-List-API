@@ -23,8 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -280,5 +279,69 @@ public class TeamServiceImpl implements ITeamService{
             return userDto;
         }).collect(Collectors.toList()));
         return response;
+    }
+
+    @Override
+    public Map<String, Object> buildCalendarData(int year, int month, Long teamId) {
+        List<ApiTodoResponse> teamTodos = getTeamTodosByMonth(teamId, year, month);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("dayHeaders", List.of("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"));
+
+        String monthName = java.time.Month.of(month).name();
+        monthName = monthName.charAt(0) + monthName.substring(1).toLowerCase();
+        result.put("monthLabel", monthName + " " + year);
+
+        int prevYear = (month == 1) ? year - 1 : year;
+        int prevMonth = (month == 1) ? 12 : month - 1;
+        int nextYear = (month == 12) ? year + 1 : year;
+        int nextMonth = (month == 12) ? 1 : month + 1;
+        result.put("prevMonth", String.format("%d-%02d", prevYear, prevMonth));
+        result.put("nextMonth", String.format("%d-%02d", nextYear, nextMonth));
+
+        result.put("calendar", buildCalendarGrid(year, month, teamTodos));
+        return result;
+    }
+
+    private List<Map<String, Object>> buildCalendarGrid(int year, int month, List<ApiTodoResponse> teamTodos) {
+        List<Map<String, Object>> calendar = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        LocalDate firstDay = LocalDate.of(year, month, 1);
+        int daysInMonth = firstDay.lengthOfMonth();
+
+        int startDayOfWeek = firstDay.getDayOfWeek().getValue();
+        for (int i = 1; i < startDayOfWeek; i++) {
+            Map<String, Object> emptyDay = new HashMap<>();
+            emptyDay.put("day", null);
+            emptyDay.put("currentMonth", false);
+            emptyDay.put("today", false);
+            emptyDay.put("todos", Collections.emptyList());
+            calendar.add(emptyDay);
+        }
+
+        for (int day = 1; day <= daysInMonth; day++) {
+            LocalDate date = LocalDate.of(year, month, day);
+            Map<String, Object> dayData = new HashMap<>();
+            dayData.put("day", day);
+            dayData.put("currentMonth", true);
+            dayData.put("today", date.equals(today));
+
+            List<ApiTodoResponse> dayTodos = teamTodos.stream()
+                    .filter(t -> t.getDueDate() != null && t.getDueDate().toLocalDate().equals(date))
+                    .collect(Collectors.toList());
+            dayData.put("todos", dayTodos);
+            calendar.add(dayData);
+        }
+
+        while (calendar.size() % 7 != 0) {
+            Map<String, Object> emptyDay = new HashMap<>();
+            emptyDay.put("day", null);
+            emptyDay.put("currentMonth", false);
+            emptyDay.put("today", false);
+            emptyDay.put("todos", Collections.emptyList());
+            calendar.add(emptyDay);
+        }
+
+        return calendar;
     }
 }
