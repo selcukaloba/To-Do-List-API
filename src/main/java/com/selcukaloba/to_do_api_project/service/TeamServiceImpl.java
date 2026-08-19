@@ -358,4 +358,19 @@ public class TeamServiceImpl implements ITeamService{
 
         return calendar;
     }
+
+    @Override
+    public boolean isUserTeamMember(Long teamId, String username)
+    {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("Team: " + teamId, MessageType.TEAM_NOT_FOUND)));
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BaseException(new ErrorMessage(username, MessageType.USERNAME_NOT_FOUND)));
+
+        boolean isLeader = team.getLeader().getUsername().equals(username);
+        boolean isMember = teamMemberRepository.existsByTeamAndUser(team, user);
+
+        return isLeader || isMember;
+    }
 }
