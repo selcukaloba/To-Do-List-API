@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class TodoServiceImpl implements ITodoService{
+public class TodoServiceImpl implements ITodoService {
 
     @Autowired
     private TodoRepository todoRepository;
@@ -37,7 +37,8 @@ public class TodoServiceImpl implements ITodoService{
 
     @Override
     public ApiTodoResponse createTodo(ApiTodoCreateRequest request, String username) {
-        User owner = userRepository.findByUsername(username).orElseThrow(()->new BaseException(new ErrorMessage( username, MessageType.USERNAME_NOT_FOUND)));
+        User owner = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BaseException(new ErrorMessage(username, MessageType.USERNAME_NOT_FOUND)));
 
         ApiTodoResponse response = new ApiTodoResponse();
         Todo todo = new Todo();
@@ -52,15 +53,14 @@ public class TodoServiceImpl implements ITodoService{
     public List<ApiTodoResponse> getAllTodo(String username) {
         List<Todo> todoList = todoRepository.findAllTodosByOwnerOrSharedUser(username);
         List<ApiTodoResponse> responseList = new ArrayList<>();
-        for(Todo todo: todoList) {
+        for (Todo todo : todoList) {
             ApiTodoResponse dto = new ApiTodoResponse();
             BeanUtils.copyProperties(todo, dto);
-            if(!todo.getUser().getUsername().equals(username)) {
+            if (!todo.getUser().getUsername().equals(username)) {
                 dto.setOwnerUsername(todo.getUser().getUsername());
             }
             int commentCount = commentRepository.countByTodoId(todo.getId());
             dto.setCommentCount(commentCount);
-
             responseList.add(dto);
         }
         return responseList;
@@ -68,45 +68,45 @@ public class TodoServiceImpl implements ITodoService{
 
     @Override
     public ApiTodoResponse updateTodo(Long id, ApiTodoUpdateRequest request, String username) {
-        Todo todo = todoRepository.findById(id)
-                .orElseThrow(() -> new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NO_RECORD_EXISTS)));
+        // Repository seviyesinde yetki kontrolü - sadece owner güncelleyebilir
+        Todo todo = todoRepository.findByIdAndAuthorizedUser(id, username)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.TODO_NOT_FOUND)));
 
-        if(!todo.getUser().getUsername().equals(username))
-        {
+        // updateTodo sadece owner tarafından yapılabilir (shared kullanıcı güncelleyemez)
+        if (!todo.getUser().getUsername().equals(username)) {
             throw new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NOT_TODO_OWNER));
         }
 
-            BeanUtils.copyProperties(request, todo);
-            todo.setId(id);
-            Todo updatedTodo = todoRepository.save(todo);
-            ApiTodoResponse response = new ApiTodoResponse();
-            BeanUtils.copyProperties(updatedTodo, response);
-            return response;
+        BeanUtils.copyProperties(request, todo);
+        todo.setId(id);
+        Todo updatedTodo = todoRepository.save(todo);
+        ApiTodoResponse response = new ApiTodoResponse();
+        BeanUtils.copyProperties(updatedTodo, response);
+        return response;
     }
 
     @Override
     @Transactional
     public void deleteTodo(Long id, String username) {
-        Todo todo = todoRepository.findById(id).orElseThrow(()->new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NO_RECORD_EXISTS)));
-        User currentUser = userRepository.findByUsername(username).orElseThrow(()->new BaseException(new ErrorMessage(username, MessageType.USERNAME_NOT_FOUND)));
+        // Repository seviyesinde yetki kontrolü
+        Todo todo = todoRepository.findByIdAndAuthorizedUser(id, username)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.TODO_NOT_FOUND)));
 
-        if(todo.getUser().getUsername().equals(username))
-        {
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BaseException(new ErrorMessage(username, MessageType.USERNAME_NOT_FOUND)));
+
+        if (todo.getUser().getUsername().equals(username)) {
+            // Owner ise: tüm bağlı kayıtları sil ve todo'yu sil
             commentRepository.deleteByTodoId(id);
             todoShareRequestRepository.deleteAllByTodoId(id);
             todoShareRepository.deleteAllByTodoId(id);
             todoRepository.delete(todo);
-        }
-
-        else
-        {
-            boolean isSharedWithMe= todoShareRepository.existsByTodoIdAndSharedUserId(id, currentUser.getId());
-            if(isSharedWithMe)
-            {
+        } else {
+            // Shared kullanıcı ise: sadece kendi share kaydını sil
+            boolean isSharedWithMe = todoShareRepository.existsByTodoIdAndSharedUserId(id, currentUser.getId());
+            if (isSharedWithMe) {
                 todoShareRepository.deleteByTodoIdAndSharedUserId(id, currentUser.getId());
-            }
-            else
-            {
+            } else {
                 throw new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NOT_TODO_OWNER));
             }
         }
@@ -117,10 +117,8 @@ public class TodoServiceImpl implements ITodoService{
 
     @Override
     public List<ApiTodoResponse> getUpcomingReminders(String username, int days) {
-
-        if(days<0 || days>maxUpcomingDays)
-        {
-            throw new BaseException(new ErrorMessage("Requested: "+ days + ", Max: "+ maxUpcomingDays, MessageType.INVALID_DAY_RANGE));
+        if (days < 0 || days > maxUpcomingDays) {
+            throw new BaseException(new ErrorMessage("Requested: " + days + ", Max: " + maxUpcomingDays, MessageType.INVALID_DAY_RANGE));
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -129,8 +127,7 @@ public class TodoServiceImpl implements ITodoService{
         List<Todo> todoList = todoRepository.findUpcomingRemindersByUser(now, targetTime, username);
         List<ApiTodoResponse> responseList = new ArrayList<>();
 
-        for(Todo todo : todoList)
-        {
+        for (Todo todo : todoList) {
             ApiTodoResponse dto = new ApiTodoResponse();
             BeanUtils.copyProperties(todo, dto);
             responseList.add(dto);
@@ -141,23 +138,22 @@ public class TodoServiceImpl implements ITodoService{
     @Override
     @Transactional
     public void shareTodoWithFriend(Long id, String ownerUsername, String friendUsername) {
-        Todo todo = todoRepository.findById(id).orElseThrow(()->new BaseException(new ErrorMessage("Todo ID: "+ id, MessageType.TODO_NOT_FOUND)));
+        Todo todo = todoRepository.findById(id)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.TODO_NOT_FOUND)));
 
-        if(!ownerUsername.equals(todo.getUser().getUsername()))
-        {
-            throw new BaseException(new ErrorMessage("Todo ID: " +  id, MessageType.NOT_TODO_OWNER));
+        if (!ownerUsername.equals(todo.getUser().getUsername())) {
+            throw new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NOT_TODO_OWNER));
         }
 
-        User friend = userRepository.findByUsername(friendUsername).orElseThrow(()-> new BaseException(new ErrorMessage(friendUsername, MessageType.FRIEND_NOT_FOUND)));
+        User friend = userRepository.findByUsername(friendUsername)
+                .orElseThrow(() -> new BaseException(new ErrorMessage(friendUsername, MessageType.FRIEND_NOT_FOUND)));
 
-        if(!todo.getUser().getFriends().contains(friend))
-        {
+        if (!todo.getUser().getFriends().contains(friend)) {
             throw new BaseException(new ErrorMessage(friendUsername, MessageType.NOT_FRIENDS));
         }
 
-        if(todoShareRepository.existsByTodoAndSharedUser(todo, friend))
-        {
-            throw new BaseException(new ErrorMessage("Todo ID: "+ id + ", User: " + friendUsername, MessageType.ALREADY_SHARED));
+        if (todoShareRepository.existsByTodoAndSharedUser(todo, friend)) {
+            throw new BaseException(new ErrorMessage("Todo ID: " + id + ", User: " + friendUsername, MessageType.ALREADY_SHARED));
         }
 
         boolean hasPendingShare = todoShareRequestRepository
@@ -180,11 +176,9 @@ public class TodoServiceImpl implements ITodoService{
     @Override
     public List<ApiTodoResponse> getSharedTodos(String username) {
         List<Todo> todos = todoRepository.findAllTodosByOwnerOrSharedUser(username);
-
         List<ApiTodoResponse> responseList = new ArrayList<>();
 
-        for(Todo todo : todos)
-        {
+        for (Todo todo : todos) {
             ApiTodoResponse response = new ApiTodoResponse();
             BeanUtils.copyProperties(todo, response);
             responseList.add(response);
@@ -196,7 +190,7 @@ public class TodoServiceImpl implements ITodoService{
     public List<ApiTodoShareRequestResponse> getPendingShareRequests(String username) {
         List<TodoShareRequest> requests = todoShareRequestRepository.findByReceiverUsernameAndStatus(username, TodoShareStatus.PENDING);
         return requests.stream()
-                .map(req->new ApiTodoShareRequestResponse(
+                .map(req -> new ApiTodoShareRequestResponse(
                         req.getId(),
                         req.getSender().getUsername(),
                         req.getReceiver().getUsername(),
@@ -209,12 +203,13 @@ public class TodoServiceImpl implements ITodoService{
     @Override
     @Transactional
     public void acceptShareRequest(Long requestId, String username) {
-        TodoShareRequest todoShareRequest = todoShareRequestRepository.findById(requestId).orElseThrow(()->new BaseException(new ErrorMessage("Request ID: " + requestId, MessageType.SHARE_REQUEST_NOT_FOUND)));
+        TodoShareRequest todoShareRequest = todoShareRequestRepository.findById(requestId)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("Request ID: " + requestId, MessageType.SHARE_REQUEST_NOT_FOUND)));
 
-        if(!todoShareRequest.getReceiver().getUsername().equals(username))
-        {
-            throw new BaseException(new ErrorMessage("Request ID: "+ requestId, MessageType.NOT_TODO_OWNER));
+        if (!todoShareRequest.getReceiver().getUsername().equals(username)) {
+            throw new BaseException(new ErrorMessage("Request ID: " + requestId, MessageType.NOT_TODO_OWNER));
         }
+
         Todo todo = todoShareRequest.getTodo();
         User receiver = todoShareRequest.getReceiver();
         User sender = todoShareRequest.getSender();
@@ -231,11 +226,13 @@ public class TodoServiceImpl implements ITodoService{
     @Override
     @Transactional
     public void rejectShareRequest(Long requestId, String username) {
-        TodoShareRequest todoShareRequest = todoShareRequestRepository.findById(requestId).orElseThrow(()->new BaseException(new ErrorMessage("Request ID: " + requestId, MessageType.SHARE_REQUEST_NOT_FOUND)));
-        if(!todoShareRequest.getReceiver().getUsername().equals(username))
-        {
+        TodoShareRequest todoShareRequest = todoShareRequestRepository.findById(requestId)
+                .orElseThrow(() -> new BaseException(new ErrorMessage("Request ID: " + requestId, MessageType.SHARE_REQUEST_NOT_FOUND)));
+
+        if (!todoShareRequest.getReceiver().getUsername().equals(username)) {
             throw new BaseException(new ErrorMessage("Request ID: " + requestId, MessageType.NOT_TODO_OWNER));
         }
+
         todoShareRequestRepository.delete(todoShareRequest);
     }
 }
