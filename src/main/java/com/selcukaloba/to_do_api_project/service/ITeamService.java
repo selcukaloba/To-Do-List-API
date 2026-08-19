@@ -21,4 +21,5 @@ public interface ITeamService {
     void deleteTeam(Long teamId, String leaderUsername);
     void leaveTeam(Long teamId, String username);
     Map<String, Object> buildCalendarData(int year, int month, Long teamId);
+    boolean isUserTeamMember(Long teamId, String username);
 }

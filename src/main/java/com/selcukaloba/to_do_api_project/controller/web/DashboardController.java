@@ -42,6 +42,12 @@ public class DashboardController {
             model.addAttribute("newTodo", new ApiTodoCreateRequest());
 
             if (teamId != null) {
+                if (!teamService.isUserTeamMember(teamId, username)) {
+                    model.addAttribute("view", "team");
+                    model.addAttribute("errorMsg", "You are not a member of this team!");
+                    return "dashboard";
+                }
+
                 int year = java.time.Year.now().getValue();
                 int monthValue = java.time.LocalDate.now().getMonthValue();
 
@@ -51,7 +57,6 @@ public class DashboardController {
                     monthValue = Integer.parseInt(parts[1]);
                 }
 
-                // Takvim verisini servisten al
                 Map<String, Object> calendarData = teamService.buildCalendarData(year, monthValue, teamId);
                 ApiTeamResponse selectedTeam = teamService.getTeamDetail(teamId);
 
