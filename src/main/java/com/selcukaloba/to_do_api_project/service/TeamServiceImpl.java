@@ -125,7 +125,8 @@ public class TeamServiceImpl implements ITeamService{
         boolean isLeader = team.getLeader().getUsername().equals(username);
         boolean isMember = teamMemberRepository.existsByTeamAndUser(team, user);
 
-        if (!isLeader && !isMember) {
+        if (!isLeader && !isMember)
+        {
             throw new BaseException(new ErrorMessage(username, MessageType.NOT_TEAM_MEMBER));
         }
 
