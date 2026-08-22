@@ -20,6 +20,6 @@ public interface ITeamService {
     List<ApiTodoResponse> getTeamTodosByMonth(Long teamId, int year, int month);
     void deleteTeam(Long teamId, String leaderUsername);
     void leaveTeam(Long teamId, String username);
-    Map<String, Object> buildCalendarData(int year, int month, Long teamId);
+    Map<String, Object> buildCalendarData(Long teamId, String username, String month);
     boolean isUserTeamMember(Long teamId, String username);
 }

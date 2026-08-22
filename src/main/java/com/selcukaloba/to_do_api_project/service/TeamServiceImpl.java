@@ -296,24 +296,37 @@ public class TeamServiceImpl implements ITeamService{
     }
 
     @Override
-    public Map<String, Object> buildCalendarData(int year, int month, Long teamId) {
-        List<ApiTodoResponse> teamTodos = getTeamTodosByMonth(teamId, year, month);
+    public Map<String, Object> buildCalendarData(Long teamId, String username, String month) {
+        if (!isUserTeamMember(teamId, username)) {
+            throw new BaseException(new ErrorMessage(username, MessageType.NOT_TEAM_MEMBER));
+        }
+
+        int year = java.time.Year.now().getValue();
+        int monthValue = java.time.LocalDate.now().getMonthValue();
+        if (month != null && month.matches("\\d{4}-\\d{2}")) {
+            String[] parts = month.split("-");
+            year = Integer.parseInt(parts[0]);
+            monthValue = Integer.parseInt(parts[1]);
+        }
+
+        List<ApiTodoResponse> teamTodos = getTeamTodosByMonth(teamId, year, monthValue);
 
         Map<String, Object> result = new HashMap<>();
         result.put("dayHeaders", List.of("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"));
 
-        String monthName = java.time.Month.of(month).name();
+        String monthName = java.time.Month.of(monthValue).name();
         monthName = monthName.charAt(0) + monthName.substring(1).toLowerCase();
         result.put("monthLabel", monthName + " " + year);
 
-        int prevYear = (month == 1) ? year - 1 : year;
-        int prevMonth = (month == 1) ? 12 : month - 1;
-        int nextYear = (month == 12) ? year + 1 : year;
-        int nextMonth = (month == 12) ? 1 : month + 1;
+        int prevYear = (monthValue == 1) ? year - 1 : year;
+        int prevMonth = (monthValue == 1) ? 12 : monthValue - 1;
+        int nextYear = (monthValue == 12) ? year + 1 : year;
+        int nextMonth = (monthValue == 12) ? 1 : monthValue + 1;
         result.put("prevMonth", String.format("%d-%02d", prevYear, prevMonth));
         result.put("nextMonth", String.format("%d-%02d", nextYear, nextMonth));
 
-        result.put("calendar", buildCalendarGrid(year, month, teamTodos));
+        result.put("calendar", buildCalendarGrid(year, monthValue, teamTodos));
+        result.put("selectedTeam", getTeamDetail(teamId));
         return result;
     }
 
