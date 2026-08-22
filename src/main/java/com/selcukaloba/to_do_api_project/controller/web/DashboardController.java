@@ -38,36 +38,18 @@ public class DashboardController {
         model.addAttribute("teams", teamService.getTeams(username));
         model.addAttribute("username", username);
 
-        //deneme
         if ("team".equals(view)) {
             model.addAttribute("view", "team");
             model.addAttribute("newTodo", new ApiTodoCreateRequest());
 
             if (teamId != null) {
-                if (!teamService.isUserTeamMember(teamId, username)) {
-                    model.addAttribute("view", "team");
-                    model.addAttribute("errorMsg", "You are not a member of this team!");
-                    return "dashboard";
-                }
-
-                int year = java.time.Year.now().getValue();
-                int monthValue = java.time.LocalDate.now().getMonthValue();
-
-                if (month != null && month.matches("\\d{4}-\\d{2}")) {
-                    String[] parts = month.split("-");
-                    year = Integer.parseInt(parts[0]);
-                    monthValue = Integer.parseInt(parts[1]);
-                }
-
-                Map<String, Object> calendarData = teamService.buildCalendarData(year, monthValue, teamId);
-                ApiTeamResponse selectedTeam = teamService.getTeamDetail(teamId);
-
+                Map<String, Object> calendarData = teamService.buildCalendarData(teamId, username, month);
                 model.addAttribute("dayHeaders", calendarData.get("dayHeaders"));
                 model.addAttribute("monthLabel", calendarData.get("monthLabel"));
                 model.addAttribute("prevMonth", calendarData.get("prevMonth"));
                 model.addAttribute("nextMonth", calendarData.get("nextMonth"));
                 model.addAttribute("calendarData", calendarData.get("calendar"));
-                model.addAttribute("selectedTeam", selectedTeam);
+                model.addAttribute("selectedTeam", calendarData.get("selectedTeam"));
             }
 
             return "dashboard";
