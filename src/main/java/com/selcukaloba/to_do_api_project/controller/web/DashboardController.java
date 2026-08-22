@@ -38,6 +38,7 @@ public class DashboardController {
         model.addAttribute("teams", teamService.getTeams(username));
         model.addAttribute("username", username);
 
+        //deneme
         if ("team".equals(view)) {
             model.addAttribute("view", "team");
             model.addAttribute("newTodo", new ApiTodoCreateRequest());
