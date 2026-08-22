@@ -3,6 +3,7 @@ package com.selcukaloba.to_do_api_project.controller.web;
 import com.selcukaloba.to_do_api_project.dto.ApiTeamResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoCreateRequest;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoResponse;
+import com.selcukaloba.to_do_api_project.util.IdEncoder;
 import com.selcukaloba.to_do_api_project.service.IFriendRequestService;
 import com.selcukaloba.to_do_api_project.service.ITeamService;
 import com.selcukaloba.to_do_api_project.service.ITodoService;
@@ -82,18 +83,18 @@ public class TeamController {
 
     @PostMapping("/teams/{teamId}/assign-existing-todo")
     public String assignExistingTodoToTeam(@PathVariable Long teamId,
-                                           @RequestParam Long todoId,
+                                           @RequestParam String encodedId,
                                            @RequestParam(required = false) String assignedToUsername,
                                            Principal principal,
                                            RedirectAttributes redirectAttributes) {
-        teamService.assignExistingTodoToTeam(teamId, todoId, assignedToUsername, principal.getName());
+        teamService.assignExistingTodoToTeam(teamId, IdEncoder.decode(encodedId), assignedToUsername, principal.getName());
         redirectAttributes.addFlashAttribute("successMsg", "Task assigned to team!");
         return "redirect:/teams";
     }
 
-    @PostMapping("/teams/todo/delete/{todoId}")
-    public String deleteTeamTodo(@PathVariable Long todoId, Principal principal, RedirectAttributes redirectAttributes) {
-        teamService.deleteTeamTodo(todoId, principal.getName());
+    @PostMapping("/teams/todo/delete/{encodedId}")
+    public String deleteTeamTodo(@PathVariable String encodedId, Principal principal, RedirectAttributes redirectAttributes) {
+        teamService.deleteTeamTodo(IdEncoder.decode(encodedId), principal.getName());
         redirectAttributes.addFlashAttribute("successMsg", "Task deleted successfully!");
         return "redirect:/teams";
     }

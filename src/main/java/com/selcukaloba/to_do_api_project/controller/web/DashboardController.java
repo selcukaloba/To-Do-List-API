@@ -4,6 +4,7 @@ import com.selcukaloba.to_do_api_project.dto.ApiTeamResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoCreateRequest;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoUpdateRequest;
+import com.selcukaloba.to_do_api_project.util.IdEncoder;
 import com.selcukaloba.to_do_api_project.service.ITeamService;
 import com.selcukaloba.to_do_api_project.service.ITodoService;
 import jakarta.validation.Valid;
@@ -37,6 +38,7 @@ public class DashboardController {
         model.addAttribute("teams", teamService.getTeams(username));
         model.addAttribute("username", username);
 
+        //deneme
         if ("team".equals(view)) {
             model.addAttribute("view", "team");
             model.addAttribute("newTodo", new ApiTodoCreateRequest());
@@ -98,8 +100,8 @@ public class DashboardController {
         return "redirect:/dashboard";
     }
 
-    @PostMapping("/dashboard/todo/update/{id}")
-    public String updateTodo(@PathVariable Long id,
+    @PostMapping("/dashboard/todo/update/{encodedId}")
+    public String updateTodo(@PathVariable String encodedId,
                              @Valid @ModelAttribute ApiTodoUpdateRequest request,
                              BindingResult bindingResult,
                              Principal principal,
@@ -108,14 +110,14 @@ public class DashboardController {
             redirectAttributes.addFlashAttribute("errorMsg", bindingResult.getAllErrors().get(0).getDefaultMessage());
             return "redirect:/dashboard";
         }
-        todoService.updateTodo(id, request, principal.getName());
+        todoService.updateTodo(IdEncoder.decode(encodedId), request, principal.getName());
         redirectAttributes.addFlashAttribute("successMsg", "Task updated successfully!");
         return "redirect:/dashboard";
     }
 
-    @PostMapping("/dashboard/todo/delete/{id}")
-    public String deleteTodo(@PathVariable Long id, Principal principal, RedirectAttributes redirectAttributes) {
-        todoService.deleteTodo(id, principal.getName());
+    @PostMapping("/dashboard/todo/delete/{encodedId}")
+    public String deleteTodo(@PathVariable String encodedId, Principal principal, RedirectAttributes redirectAttributes) {
+        todoService.deleteTodo(IdEncoder.decode(encodedId), principal.getName());
         redirectAttributes.addFlashAttribute("successMsg", "Task deleted successfully!");
         return "redirect:/dashboard";
     }
