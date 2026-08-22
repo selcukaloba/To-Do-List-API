@@ -10,6 +10,7 @@ import com.selcukaloba.to_do_api_project.exception.BaseException;
 import com.selcukaloba.to_do_api_project.exception.ErrorMessage;
 import com.selcukaloba.to_do_api_project.exception.MessageType;
 import com.selcukaloba.to_do_api_project.repository.*;
+import com.selcukaloba.to_do_api_project.util.IdEncoder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,6 +47,7 @@ public class TodoServiceImpl implements ITodoService {
         todo.setUser(owner);
         Todo dbTodo = todoRepository.save(todo);
         BeanUtils.copyProperties(dbTodo, response);
+        response.setEncodedId(IdEncoder.encode(todo.getId()));
         return response;
     }
 
@@ -61,6 +63,7 @@ public class TodoServiceImpl implements ITodoService {
             }
             int commentCount = commentRepository.countByTodoId(todo.getId());
             dto.setCommentCount(commentCount);
+            dto.setEncodedId(IdEncoder.encode(todo.getId()));
             responseList.add(dto);
         }
         return responseList;
@@ -68,11 +71,9 @@ public class TodoServiceImpl implements ITodoService {
 
     @Override
     public ApiTodoResponse updateTodo(Long id, ApiTodoUpdateRequest request, String username) {
-        // Repository seviyesinde yetki kontrolü - sadece owner güncelleyebilir
         Todo todo = todoRepository.findByIdAndAuthorizedUser(id, username)
                 .orElseThrow(() -> new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.TODO_NOT_FOUND)));
 
-        // updateTodo sadece owner tarafından yapılabilir (shared kullanıcı güncelleyemez)
         if (!todo.getUser().getUsername().equals(username)) {
             throw new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.NOT_TODO_OWNER));
         }
@@ -82,13 +83,13 @@ public class TodoServiceImpl implements ITodoService {
         Todo updatedTodo = todoRepository.save(todo);
         ApiTodoResponse response = new ApiTodoResponse();
         BeanUtils.copyProperties(updatedTodo, response);
+        response.setEncodedId(IdEncoder.encode(todo.getId()));
         return response;
     }
 
     @Override
     @Transactional
     public void deleteTodo(Long id, String username) {
-        // Repository seviyesinde yetki kontrolü
         Todo todo = todoRepository.findByIdAndAuthorizedUser(id, username)
                 .orElseThrow(() -> new BaseException(new ErrorMessage("Todo ID: " + id, MessageType.TODO_NOT_FOUND)));
 
@@ -96,13 +97,11 @@ public class TodoServiceImpl implements ITodoService {
                 .orElseThrow(() -> new BaseException(new ErrorMessage(username, MessageType.USERNAME_NOT_FOUND)));
 
         if (todo.getUser().getUsername().equals(username)) {
-            // Owner ise: tüm bağlı kayıtları sil ve todo'yu sil
             commentRepository.deleteByTodoId(id);
             todoShareRequestRepository.deleteAllByTodoId(id);
             todoShareRepository.deleteAllByTodoId(id);
             todoRepository.delete(todo);
         } else {
-            // Shared kullanıcı ise: sadece kendi share kaydını sil
             boolean isSharedWithMe = todoShareRepository.existsByTodoIdAndSharedUserId(id, currentUser.getId());
             if (isSharedWithMe) {
                 todoShareRepository.deleteByTodoIdAndSharedUserId(id, currentUser.getId());
@@ -130,6 +129,7 @@ public class TodoServiceImpl implements ITodoService {
         for (Todo todo : todoList) {
             ApiTodoResponse dto = new ApiTodoResponse();
             BeanUtils.copyProperties(todo, dto);
+            dto.setEncodedId(IdEncoder.encode(todo.getId()));
             responseList.add(dto);
         }
         return responseList;
@@ -181,6 +181,7 @@ public class TodoServiceImpl implements ITodoService {
         for (Todo todo : todos) {
             ApiTodoResponse response = new ApiTodoResponse();
             BeanUtils.copyProperties(todo, response);
+            response.setEncodedId(IdEncoder.encode(todo.getId()));
             responseList.add(response);
         }
         return responseList;

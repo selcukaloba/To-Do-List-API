@@ -110,14 +110,13 @@
 
         <div class="lg:col-span-2 space-y-6">
 
-
             <div class="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)]">
                 <h3 class="text-sm font-semibold text-zinc-900 mb-4">Share a Task</h3>
                 <form th:action="@{/friends/share}" method="post" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
                     <div class="sm:col-span-2">
-                        <select name="todoId" required class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
+                        <select name="encodedId" required class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 focus:outline-none focus:border-zinc-900">
                             <option value="">Select a task...</option>
-                            <option th:each="todo : ${myTodos}" th:value="${todo.id}" th:text="${todo.title}">Task</option>
+                            <option th:each="todo : ${myTodos}" th:value="${todo.encodedId}" th:text="${todo.title}">Task</option>
                         </select>
                     </div>
                     <div class="sm:col-span-2">

@@ -4,6 +4,7 @@ import com.selcukaloba.to_do_api_project.dto.ApiFriendRequestResponse;
 import com.selcukaloba.to_do_api_project.dto.ApiUserResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoResponse;
 import com.selcukaloba.to_do_api_project.dto.todo.ApiTodoShareRequestResponse;
+import com.selcukaloba.to_do_api_project.util.IdEncoder;
 import com.selcukaloba.to_do_api_project.service.IFriendRequestService;
 import com.selcukaloba.to_do_api_project.service.ITodoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +66,8 @@ public class FriendsController {
     }
 
     @PostMapping("/friends/share")
-    public String shareTodo(@RequestParam Long todoId, @RequestParam String friendUsername, Principal principal, RedirectAttributes redirectAttributes) {
-        todoService.shareTodoWithFriend(todoId, principal.getName(), friendUsername);
+    public String shareTodo(@RequestParam String encodedId, @RequestParam String friendUsername, Principal principal, RedirectAttributes redirectAttributes) {
+        todoService.shareTodoWithFriend(IdEncoder.decode(encodedId), principal.getName(), friendUsername);
         redirectAttributes.addFlashAttribute("successMsg", "Task invitation sent successfully!");
         return "redirect:/friends";
     }

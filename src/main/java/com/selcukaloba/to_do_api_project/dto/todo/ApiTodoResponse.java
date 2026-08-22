@@ -29,7 +29,7 @@ public class ApiTodoResponse {
     private String assignedToUsername;
     private TodoStatus status;
     private int commentCount;
-
+    private String encodedId;
     public void setIsCompleted(Boolean isCompleted) {
         this.isCompleted = isCompleted;
     }
